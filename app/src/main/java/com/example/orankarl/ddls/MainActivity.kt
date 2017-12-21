@@ -41,7 +41,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupViewPager(viewPager: ViewPager) {
         val adapter = Adapter(supportFragmentManager)
-        adapter.addFragment()
+        adapter.addFragment(ChatListFragment(), "DDL")
+        adapter.addFragment(ChatListFragment(), "Notice")
+        adapter.addFragment(ChatListFragment(), "Group")
+        viewPager.adapter = adapter
     }
 
     override fun onBackPressed() {
