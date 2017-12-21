@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.app_main_bar.*
 import android.support.v4.view.ViewPager
 import android.view.View
 import android.widget.Adapter
@@ -37,11 +37,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
 
         setupViewPager(viewpager)
+
+        tabs.setupWithViewPager(viewpager)
     }
 
     private fun setupViewPager(viewPager: ViewPager) {
         val adapter = Adapter(supportFragmentManager)
-        adapter.addFragment(ChatListFragment(), "DDL")
+        adapter.addFragment(DeadlineFragment(), "DDL")
         adapter.addFragment(ChatListFragment(), "Notice")
         adapter.addFragment(ChatListFragment(), "Group")
         viewPager.adapter = adapter
