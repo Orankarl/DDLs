@@ -11,14 +11,18 @@ class Deadline(var calendar: Calendar, var title:String, var info:String)
 class DeadlineList() {
     private var deadLineList:MutableList<Deadline> = mutableListOf()
 
+    init {
+        deadLineList.clear()
+        deadLineList.add(Deadline(getNewCalendar(2018, 2, 11), "组合数学作业", "第十三次"))
+        deadLineList.add(Deadline(getNewCalendar(2017, 11, 10), "图形学大作业", "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing."))
+        deadLineList.add(Deadline(getNewCalendar(2018, 1, 1), "数据库大作业", ""))
+        deadLineList.add(Deadline(getNewCalendar(2018, 1, 15), "人工智能大作业", "Building neural network by C++ (Without using any existing package)."))
+    }
+
     public fun updateDeadlineList() {
 
     }
     public fun loadDeadlineList() {
-        deadLineList.clear()
-        deadLineList.add(Deadline(getNewCalendar(2018, 2, 11), "组合数学作业", "第十三次"))
-        deadLineList.add(Deadline(getNewCalendar(2017, 11, 10), "图形学大作业", "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing."))
-        deadLineList.add(Deadline(getNewCalendar(2018, 1, 1), "数据库作业", ""))
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)
     }
 

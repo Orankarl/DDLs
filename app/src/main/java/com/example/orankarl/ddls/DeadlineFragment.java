@@ -5,7 +5,9 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,26 +20,51 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.net.PasswordAuthentication;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by orankarl on 2017/12/21.
  */
 
-public class DeadlineFragment extends Fragment {
+public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    public DeadlineList deadlineList;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_deadline, container, false);
+        View view = inflater.inflate(R.layout.fragment_deadline, container, false);
+        RecyclerView recyclerView = view.findViewById(R.id.deadline_recyclerview);
+        swipeRefreshLayout = view.findViewById(R.id.deadline_swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setProgressViewOffset(true, 0, 50);
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
+                onRefresh();
+            }
+        });
+        deadlineList = new DeadlineList();
+        deadlineList.loadDeadlineList();
         setupRecyclerView(recyclerView);
-        return recyclerView;
+        return view;
+    }
+
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), getDeadlineList())));
+        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), deadlineList)));
     }
 
     private DeadlineList getDeadlineList() {
