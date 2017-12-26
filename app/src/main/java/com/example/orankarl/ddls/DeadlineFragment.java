@@ -40,6 +40,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private View view;
+    private RecyclerView recyclerView;
 
     public DeadlineList deadlineList;
 
@@ -47,7 +48,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_deadline, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.deadline_recyclerview);
+        recyclerView = view.findViewById(R.id.deadline_recyclerview);
         swipeRefreshLayout = view.findViewById(R.id.deadline_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -67,6 +68,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void onRefresh() {
+        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), deadlineList)));
         swipeRefreshLayout.setRefreshing(false);
         RecyclerView recyclerView = view.findViewById(R.id.deadline_recyclerview);
         TextView textView = view.findViewById(R.id.deadline_empty_text);

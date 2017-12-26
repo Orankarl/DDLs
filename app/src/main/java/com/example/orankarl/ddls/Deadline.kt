@@ -20,7 +20,11 @@ class DeadlineList() {
     }
 
     public fun updateDeadlineList() {
+        Collections.sort(deadLineList, DeadlineComparator.INSTANCE)
+    }
 
+    public fun add(calendar: Calendar, title:String, info:String) {
+        deadLineList.add(Deadline(calendar, title, info))
     }
     public fun loadDeadlineList() {
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)

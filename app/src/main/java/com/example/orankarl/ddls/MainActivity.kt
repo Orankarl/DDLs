@@ -1,6 +1,7 @@
 package com.example.orankarl.ddls
 
 import android.os.Bundle
+import android.service.autofill.FillEventHistory
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
@@ -16,9 +17,23 @@ import android.support.v4.view.ViewPager
 import android.view.View
 import android.widget.Adapter
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.app.FragmentTransaction
+import android.widget.DatePicker
+import android.widget.TextView
+import com.afollestad.materialdialogs.DialogAction
 import com.example.orankarl.ddls.R.id.action_add
+import com.afollestad.materialdialogs.MaterialDialog
+import com.example.orankarl.ddls.R.id.drawer_layout
+import kotlinx.android.synthetic.main.add_deadline_dialog.view.*
+import kotlinx.android.synthetic.main.deadline_item.*
+import kotlinx.android.synthetic.main.deadline_item.view.*
+import java.util.*
+
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private lateinit var dialog:AddDeadlineDialog
+    private lateinit var adapter:MainActivity.Adapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +58,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setupViewPager(viewPager: ViewPager) {
-        val adapter = Adapter(supportFragmentManager)
+        adapter = Adapter(supportFragmentManager)
         adapter.addFragment(DeadlineFragment(), "DDL")
         adapter.addFragment(ChatListFragment(), "Notice")
         adapter.addFragment(ChatListFragment(), "Group")
@@ -79,7 +94,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun menuActionAdd() {
+//        dialog = AddDeadlineDialog()
+//        dialog.show(supportFragmentManager, dialog.tag)
+//        var dialog = MyDialog(this)
+//        dialog.show()
+        val materialDialog = MaterialDialog.Builder(this)
+                .title(R.string.add_dialog_title_code)
+                .customView(R.layout.add_deadline_dialog, true)
+                .positiveText("add")
+                .negativeText("Cancel")
+                .onPositive(MaterialDialog.SingleButtonCallback { dialog, which ->
+                    val datePicker:DatePicker = dialog.findViewById(R.id.datePicker) as DatePicker
+                    var calendar:Calendar = Calendar.getInstance()
+                    calendar.set(Calendar.YEAR, datePicker.year)
+                    calendar.set(Calendar.MONTH, datePicker.month)
+                    calendar.set(Calendar.DAY_OF_MONTH, datePicker.dayOfMonth)
 
+                    val title:TextView = dialog.findViewById(R.id.add_dialog_title) as TextView
+                    val info:TextView = dialog.findViewById(R.id.add_dialog_info) as TextView
+                    val fragmentManager = supportFragmentManager
+                    for (fragment in fragmentManager.fragments) {
+                        if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
+                            (fragment as DeadlineFragment).deadlineList.add(calendar, title.text.toString(), info.text.toString())
+                            (fragment as DeadlineFragment).deadlineList.updateDeadlineList()
+                            (fragment as DeadlineFragment).onRefresh()
+                        }
+                    }
+                })
+                .show()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

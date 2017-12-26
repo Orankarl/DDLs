@@ -4,6 +4,10 @@
 
     <string name="action_add">Add</string>
 
+    <string name="add_dialog_title_code">Add a new deadline</string>
+    <string name="add_dialog_title">请输入Deadline主题（必填）</string>
+    <string name="add_dialog_info">请输入Deadline详细信息（选填）</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
