@@ -16,7 +16,7 @@ class DeadlineList() {
         deadLineList.add(Deadline(getNewCalendar(2018, 2, 11), "组合数学作业", "第十三次"))
         deadLineList.add(Deadline(getNewCalendar(2017, 11, 10), "图形学大作业", "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing."))
         deadLineList.add(Deadline(getNewCalendar(2018, 1, 1), "数据库大作业", ""))
-        deadLineList.add(Deadline(getNewCalendar(2018, 1, 15), "人工智能大作业", "Building neural network by C++ (Without using any existing package)."))
+        deadLineList.add(Deadline(getNewCalendar(2018, 1, 1), "人工智能大作业", "Building neural network by C++ (Without using any existing package)."))
     }
 
     public fun updateDeadlineList() {
@@ -40,5 +40,9 @@ class DeadlineList() {
             set(Calendar.MONTH, month-1)
             set(Calendar.DAY_OF_MONTH, day)
         }
+    }
+
+    fun isEmpty():Boolean {
+        return deadLineList.isEmpty()
     }
 }

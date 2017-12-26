@@ -4,10 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.media.RatingCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,10 +24,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.math.MathContext;
 import java.net.PasswordAuthentication;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static android.view.View.GONE;
 
 /**
  * Created by orankarl on 2017/12/21.
@@ -32,13 +39,14 @@ import java.util.concurrent.TimeUnit;
 public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View view;
 
     public DeadlineList deadlineList;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_deadline, container, false);
+        view = inflater.inflate(R.layout.fragment_deadline, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.deadline_recyclerview);
         swipeRefreshLayout = view.findViewById(R.id.deadline_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
@@ -60,6 +68,15 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
+        RecyclerView recyclerView = view.findViewById(R.id.deadline_recyclerview);
+        TextView textView = view.findViewById(R.id.deadline_empty_text);
+        if (deadlineList.isEmpty()) {
+            recyclerView.setVisibility(GONE);
+            textView.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            textView.setVisibility(GONE);
+        }
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
@@ -90,6 +107,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             public final TextView textView3;
             public final TextView textView4;
             public final FrameLayout itemLine;
+            public final CardView cardView;
 
             public ViewHolder(View view) {
                 super(view);
@@ -99,6 +117,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 textView3 = view.findViewById(R.id.deadline_item_date);
                 textView4 = view.findViewById(R.id.deadline_item_year);
                 itemLine = view.findViewById(R.id.item_line);
+                cardView = view.findViewById(R.id.deadline_cardview);
             }
         }
 
@@ -118,15 +137,31 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             Deadline deadline = values.get(position);
-            String month = String.valueOf(deadline.getCalendar().get(Calendar.MONTH) + 1);
+            Calendar calendar = deadline.getCalendar();
+            String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
             if (month.length() == 1) month = "0" + month;
-            String date = String.valueOf(deadline.getCalendar().get(Calendar.DATE));
+            String date = String.valueOf(calendar.get(Calendar.DATE));
             if (date.length() == 1) date = "0" + date;
-            String year = String.valueOf(deadline.getCalendar().get(Calendar.YEAR));
+            String year = String.valueOf(calendar.get(Calendar.YEAR));
             holder.textView3.setText(month+"."+date);
             holder.textView4.setText(year);
+            if (position > 0) {
+                Deadline pre_deadline = values.get(position - 1);
+                Calendar pre_calendar = pre_deadline.getCalendar();
+                if (pre_calendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)
+                        && pre_calendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)
+                        && pre_calendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)) {
+                    holder.textView3.setVisibility(GONE);
+                    holder.textView4.setVisibility(GONE);
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
+                    params.topMargin = 4;
+                }
+            }
             holder.textView1.setText(deadline.getTitle());
             holder.textView2.setText(deadline.getInfo());
+            if (holder.textView2.getText().toString().equals("")) {
+                holder.textView2.setVisibility(GONE);
+            }
 
             Calendar calendar1 = Calendar.getInstance();
 
@@ -149,8 +184,9 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
             if (calendar1.after(deadline.getCalendar())) {
+//                holder.itemLine.setBackgroundResource(R.color.colorAccent);
                 GradientDrawable gradientDrawable =  (GradientDrawable) holder.itemLine.getBackground();
-                gradientDrawable.setColor(Color.GRAY);
+                gradientDrawable.setColor(Color.parseColor("#FF5722"));
             }
 
 //            holder.view.setOnClickListener();

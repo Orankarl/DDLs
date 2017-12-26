@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager
 import android.view.View
 import android.widget.Adapter
 import android.support.v4.app.FragmentPagerAdapter
+import com.example.orankarl.ddls.R.id.action_add
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -69,8 +70,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_settings -> return true
+            R.id.action_add -> {
+                menuActionAdd()
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun menuActionAdd() {
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
