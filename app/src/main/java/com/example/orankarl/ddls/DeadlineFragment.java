@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.math.MathContext;
 import java.net.PasswordAuthentication;
 import java.util.Calendar;
@@ -31,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static android.view.View.GONE;
+import static android.view.View.resolveSize;
 
 /**
  * Created by orankarl on 2017/12/21.
@@ -138,7 +143,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Deadline deadline = values.get(position);
+            final Deadline deadline = values.get(position);
             Calendar calendar = deadline.getCalendar();
             String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
             if (month.length() == 1) month = "0" + month;
@@ -191,7 +196,34 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 gradientDrawable.setColor(Color.parseColor("#FF5722"));
             }
 
-//            holder.view.setOnClickListener();
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new MaterialDialog.Builder(view.getContext())
+                            .title(deadline.getTitle())
+                            .content(deadline.getInfo())
+                            .positiveText(R.string.info_dialog_finish)
+                            .negativeText(R.string.cancel)
+                            .neutralText(R.string.info_dialog_delete)
+                            .onAny(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    switch (which) {
+                                        case NEUTRAL:{
+
+                                            break;
+                                        }
+                                        case POSITIVE:{
+
+                                            break;
+                                        }
+                                        default:break;
+                                    }
+                                }
+                            })
+                            .show();
+                }
+            });
         }
 
         @Override

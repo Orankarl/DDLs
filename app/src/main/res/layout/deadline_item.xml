@@ -74,6 +74,8 @@
 
             <TextView
                 android:id="@+id/card_info"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>

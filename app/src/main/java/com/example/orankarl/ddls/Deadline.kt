@@ -19,14 +19,14 @@ class DeadlineList() {
         deadLineList.add(Deadline(getNewCalendar(2018, 1, 1), "人工智能大作业", "Building neural network by C++ (Without using any existing package)."))
     }
 
-    public fun updateDeadlineList() {
+    fun updateDeadlineList() {
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)
     }
 
-    public fun add(calendar: Calendar, title:String, info:String) {
+    fun add(calendar: Calendar, title:String, info:String) {
         deadLineList.add(Deadline(calendar, title, info))
     }
-    public fun loadDeadlineList() {
+    fun loadDeadlineList() {
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)
     }
 

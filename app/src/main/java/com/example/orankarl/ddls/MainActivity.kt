@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupViewPager(viewPager: ViewPager) {
         adapter = Adapter(supportFragmentManager)
         adapter.addFragment(DeadlineFragment(), "DDL")
-        adapter.addFragment(ChatListFragment(), "Notice")
+        adapter.addFragment(NoticeFragment(), "Notice")
         adapter.addFragment(ChatListFragment(), "Group")
         viewPager.adapter = adapter
     }
