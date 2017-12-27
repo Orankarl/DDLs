@@ -31,15 +31,24 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-
     <FrameLayout
-        android:layout_width="8dp"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        android:paddingRight="16dp"
-        android:id="@+id/item_line">
-
+        android:layout_width="18dp"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:layout_gravity="center"
+            android:layout_width="8dp"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:id="@+id/item_line">
+        </FrameLayout>
+        <View
+            android:id="@+id/deadline_marker"
+            android:background="@drawable/ic_marker"
+            android:layout_gravity="center"
+            android:layout_width="16dp"
+            android:layout_height="16dp"/>
     </FrameLayout>
+
 
     <android.support.v7.widget.CardView
         android:paddingLeft="16dp"
@@ -59,26 +68,52 @@
         app:cardBackgroundColor="@android:color/background_light"
         >
         <LinearLayout
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/card_title"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="14"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/card_title"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                    android:textSize="16sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/card_info"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:id="@+id/card_info"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:textSize="12sp"
+                    android:lineSpacingMultiplier="1.25"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/deadline_right_strip"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/right_strip"
+                android:orientation="horizontal" />
         </LinearLayout>
+
 
     </android.support.v7.widget.CardView>
 

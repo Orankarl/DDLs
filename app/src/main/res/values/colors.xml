@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--<color name="colorPrimary">#3F51B5</color>-->
-    <color name="colorPrimary">#42A5F5</color>
+    <color name="colorPrimary">#29B6FC</color>
     <color name="colorPrimaryDark">#42A5F5</color>
     <!--<color name="colorPrimaryDark">#303F9F</color>-->
     <!--<color name="colorAccent">#FF4081</color>-->
@@ -301,16 +301,36 @@
     <color name="md_blue_grey_800">#37474F</color>
     <color name="md_blue_grey_900">#263238</color>
 
+    <!--<integer-array name="android_colors1">-->
+        <!--<item>@color/md_amber_900</item>-->
+        <!--<item>@color/md_blue_800</item>-->
+        <!--<item>@color/md_deep_orange_700</item>-->
+        <!--<item>@color/md_deep_purple_400</item>-->
+        <!--<item>@color/md_cyan_800</item>-->
+        <!--<item>@color/md_grey_600</item>-->
+        <!--<item>@color/md_red_900</item>-->
+        <!--<item>@color/md_blue_grey_700</item>-->
+        <!--<item>@color/md_light_green_900</item>-->
+    <!--</integer-array>-->
+
+    <integer-array name="android_colors1">
+        <item>@color/md_teal_300</item>
+        <item>@color/md_brown_300</item>
+        <item>@color/md_pink_300</item>
+        <item>@color/md_lime_300</item>
+        <item>@color/md_purple_300</item>
+    </integer-array>
+
     <integer-array name="android_colors">
-        <item>@color/md_amber_900</item>
-        <item>@color/md_blue_800</item>
-        <item>@color/md_deep_orange_700</item>
-        <item>@color/md_deep_purple_400</item>
-        <item>@color/md_cyan_800</item>
-        <item>@color/md_grey_600</item>
-        <item>@color/md_red_900</item>
-        <item>@color/md_blue_grey_700</item>
-        <item>@color/md_light_green_900</item>
+        <item>@color/md_teal_500</item>
+        <item>@color/md_brown_500</item>
+        <item>@color/md_pink_500</item>
+        <item>@color/md_lime_800</item>
+        <item>@color/md_orange_700</item>
+        <!--<item>@color/md_grey_600</item>-->
+        <!--<item>@color/md_red_900</item>-->
+        <!--<item>@color/md_blue_grey_700</item>-->
+        <!--<item>@color/md_light_green_900</item>-->
     </integer-array>
 
 </resources>

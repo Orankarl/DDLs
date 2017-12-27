@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -89,6 +90,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), deadlineList)));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     private DeadlineList getDeadlineList() {
@@ -115,6 +117,9 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             public final TextView textView4;
             public final FrameLayout itemLine;
             public final CardView cardView;
+            public final LinearLayout rightStrip;
+            public final int[] androidColors;
+            public final View marker;
 
             public ViewHolder(View view) {
                 super(view);
@@ -125,6 +130,9 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 textView4 = view.findViewById(R.id.deadline_item_year);
                 itemLine = view.findViewById(R.id.item_line);
                 cardView = view.findViewById(R.id.deadline_cardview);
+                rightStrip = view.findViewById(R.id.deadline_right_strip);
+                androidColors  = view.getResources().getIntArray(R.array.android_colors1);
+                marker = view.findViewById(R.id.deadline_marker);
             }
         }
 
@@ -163,6 +171,13 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
                     params.topMargin = 4;
                 }
+                Calendar present_calendar = Calendar.getInstance();
+                if (CalendarComparator.INSTANCE.compare(present_calendar, pre_calendar) == 1
+                        && CalendarComparator.INSTANCE.compare(pre_calendar, calendar) != 1) {
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) holder.itemLine.getLayoutParams();
+                    params.setMargins(0, 24, 0, 0);
+                    holder.itemLine.setLayoutParams(params);
+                }
             }
             holder.textView1.setText(deadline.getTitle());
             holder.textView2.setText(deadline.getInfo());
@@ -175,13 +190,13 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             switch (getItemViewType(position)) {
                 case VIEW_TYPE_TOP:
                     holder.itemLine.setBackgroundResource(R.drawable.line_bg_top);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.itemLine.getLayoutParams();
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) holder.itemLine.getLayoutParams();
                     params.setMargins(0, 24, 0, 0);
                     holder.itemLine.setLayoutParams(params);
                     break;
                 case VIEW_TYPE_BOTTOM:
                     holder.itemLine.setBackgroundResource(R.drawable.line_bg_bottom);
-                    LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) holder.itemLine.getLayoutParams();
+                    FrameLayout.LayoutParams params1 = (FrameLayout.LayoutParams) holder.itemLine.getLayoutParams();
                     params1.setMargins(0, 0, 0, 24);
                     holder.itemLine.setLayoutParams(params1);
                     break;
@@ -190,11 +205,22 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     break;
             }
 
-            if (calendar1.after(deadline.getCalendar())) {
+            if (CalendarComparator.INSTANCE.compare(calendar1, deadline.getCalendar()) == 1) {
+                Log.d("123", calendar1.toString());
+                Log.d("1", deadline.getCalendar().toString());
 //                holder.itemLine.setBackgroundResource(R.color.colorAccent);
                 GradientDrawable gradientDrawable =  (GradientDrawable) holder.itemLine.getBackground();
                 gradientDrawable.setColor(Color.parseColor("#FF5722"));
+                GradientDrawable gradientDrawable1 = (GradientDrawable) holder.marker.getBackground();
+                gradientDrawable1.setColor(Color.parseColor("#FF5722"));
+            } else {
+                GradientDrawable gradientDrawable1 = (GradientDrawable) holder.marker.getBackground();
+                gradientDrawable1.setColor(Color.parseColor("#29B6FC"));
             }
+
+            int randomAndroidColor = holder.androidColors[position % holder.androidColors.length];
+            GradientDrawable gradientDrawable = (GradientDrawable) holder.rightStrip.getBackground();
+            gradientDrawable.setColor(randomAndroidColor);
 
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override

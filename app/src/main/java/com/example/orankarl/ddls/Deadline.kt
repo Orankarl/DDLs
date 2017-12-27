@@ -1,6 +1,8 @@
 package com.example.orankarl.ddls
 
+import android.util.Log
 import java.text.FieldPosition
+import java.time.Year
 import java.util.*
 
 /**
@@ -23,8 +25,18 @@ class DeadlineList() {
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)
     }
 
-    fun add(calendar: Calendar, title:String, info:String) {
+    fun add(calendar: Calendar, title:String, info:String):Int {
+        if (title == "") return 1
+        val calendar1 = Calendar.getInstance()
+        Log.d("present", calendar1.get(Calendar.YEAR).toString()
+                +" "+calendar1.get(Calendar.MONTH).toString()
+                +" "+calendar1.get(Calendar.DAY_OF_MONTH).toString())
+        Log.d("item time", calendar.get(Calendar.YEAR).toString()
+                +" "+calendar.get(Calendar.MONTH).toString()
+                +" "+calendar.get(Calendar.DAY_OF_MONTH).toString())
+        if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1) return 2
         deadLineList.add(Deadline(calendar, title, info))
+        return 0
     }
     fun loadDeadlineList() {
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)

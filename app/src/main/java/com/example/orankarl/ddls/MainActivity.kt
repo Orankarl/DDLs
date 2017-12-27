@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.app.FragmentTransaction
 import android.widget.DatePicker
 import android.widget.TextView
+import android.widget.Toast
 import com.afollestad.materialdialogs.DialogAction
 import com.example.orankarl.ddls.R.id.action_add
 import com.afollestad.materialdialogs.MaterialDialog
@@ -39,11 +40,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -115,9 +111,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val fragmentManager = supportFragmentManager
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
-                            (fragment as DeadlineFragment).deadlineList.add(calendar, title.text.toString(), info.text.toString())
-                            (fragment as DeadlineFragment).deadlineList.updateDeadlineList()
-                            (fragment as DeadlineFragment).onRefresh()
+                            val code = (fragment as DeadlineFragment).deadlineList.add(calendar, title.text.toString(), info.text.toString())
+                            if (code == 0) {
+                                (fragment as DeadlineFragment).deadlineList.updateDeadlineList()
+                                (fragment as DeadlineFragment).onRefresh()
+                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
+                            } else if (code == 1) {
+                                Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
+                            } else if (code == 2) {
+                                Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
+                            }
+
                         }
                     }
                 })
