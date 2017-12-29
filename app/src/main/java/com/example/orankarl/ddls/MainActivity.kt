@@ -18,23 +18,26 @@ import android.view.View
 import android.widget.Adapter
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.app.FragmentTransaction
+import android.util.Log
 import android.widget.DatePicker
 import android.widget.TextView
 import android.widget.Toast
 import com.afollestad.materialdialogs.DialogAction
-import com.example.orankarl.ddls.R.id.action_add
 import com.afollestad.materialdialogs.MaterialDialog
-import com.example.orankarl.ddls.R.id.drawer_layout
+import com.example.orankarl.ddls.R.id.*
 import kotlinx.android.synthetic.main.add_deadline_dialog.view.*
 import kotlinx.android.synthetic.main.deadline_item.*
 import kotlinx.android.synthetic.main.deadline_item.view.*
+import org.litepal.LitePal
+import org.litepal.crud.DataSupport
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, DeadlineFragment.CurrentUserNameListener {
 
-    private lateinit var dialog:AddDeadlineDialog
+//    private lateinit var dialog:AddDeadlineDialog
     private lateinit var adapter:MainActivity.Adapter
+    private lateinit var currentUser:User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +52,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
 
         setupViewPager(viewpager)
-
         tabs.setupWithViewPager(viewpager)
+
+        initializeDatabase()
     }
 
     private fun setupViewPager(viewPager: ViewPager) {
@@ -59,6 +63,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         adapter.addFragment(NoticeFragment(), "Notice")
         adapter.addFragment(ChatListFragment(), "Group")
         viewPager.adapter = adapter
+    }
+
+    private fun initializeDatabase() {
+        LitePal.getDatabase()
+        var userList:List<User> = DataSupport.where("username == ?", "local").find(User::class.java)
+        if (userList.isEmpty()) {
+            var user = User()
+            user.username = "local"
+            user.save()
+            currentUser = user
+        } else {
+            currentUser = userList[0]
+        }
+
+        DataSupport.deleteAll(Deadline::class.java)
+        Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
+                "组合数学作业",
+                "第十三次",
+                currentUser.username).save()
+
+        val deadline1 = Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
+                "图形学大作业",
+                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
+                currentUser.username)
+        deadline1.save()
+
+        val deadline2 = Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+                "数据库大作业",
+                "",
+                currentUser.username)
+        deadline2.save()
+
+        val deadline3 = Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+                "人工智能大作业",
+                "Building neural network by C++ (Without using any existing package).",
+                currentUser.username)
+        deadline3.save()
+    }
+
+    public override fun getCurrentUser():User {
+        return currentUser
     }
 
     override fun onBackPressed() {
@@ -94,7 +139,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        dialog.show(supportFragmentManager, dialog.tag)
 //        var dialog = MyDialog(this)
 //        dialog.show()
-        val materialDialog = MaterialDialog.Builder(this)
+        MaterialDialog.Builder(this)
                 .title(R.string.add_dialog_title_code)
                 .customView(R.layout.add_deadline_dialog, true)
                 .positiveText("add")
@@ -111,7 +156,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val fragmentManager = supportFragmentManager
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
-                            val code = (fragment as DeadlineFragment).deadlineList.add(calendar, title.text.toString(), info.text.toString())
+                            val code = (fragment as DeadlineFragment).deadlineList.add(calendar, title.text.toString(), info.text.toString(), currentUser)
                             if (code == 0) {
                                 (fragment as DeadlineFragment).deadlineList.updateDeadlineList()
                                 (fragment as DeadlineFragment).onRefresh()
@@ -174,6 +219,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         override fun getPageTitle(position: Int): CharSequence {
             return mFragmentTitles[position]
+        }
+    }
+
+    private fun getNewCalendar(year:Int, month:Int, day:Int):Calendar {
+        return Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month-1)
+            set(Calendar.DAY_OF_MONTH, day)
         }
     }
 }

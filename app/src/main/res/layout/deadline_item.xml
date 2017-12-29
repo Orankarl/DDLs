@@ -51,6 +51,7 @@
 
 
     <android.support.v7.widget.CardView
+        app:cardPreventCornerOverlap="false"
         android:paddingLeft="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
@@ -81,25 +82,27 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
                 <TextView
+                    android:fontFamily="sans-serif-condensed"
                     android:id="@+id/card_title"
                     android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-                    android:textSize="16sp"
+                    android:textSize="17sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <TextView
-                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginTop="2dp"
                     android:layout_marginBottom="4dp"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
                     android:id="@+id/card_info"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:lineSpacingMultiplier="1.25"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

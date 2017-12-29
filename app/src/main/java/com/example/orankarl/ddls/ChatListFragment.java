@@ -2,11 +2,14 @@ package com.example.orankarl.ddls;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.DrmInitData;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.TextViewCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -27,11 +30,12 @@ import java.util.List;
 
 public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View view;
     private static final int NAME_MAX_LEN = 8;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat_list, container, false);
+        view = inflater.inflate(R.layout.fragment_chat_list, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.chat_list_recyclerview);
         swipeRefreshLayout = view.findViewById(R.id.chat_list_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
@@ -56,6 +60,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), getChatList())));
+        recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
     }
 
     private ChatList getChatList() {

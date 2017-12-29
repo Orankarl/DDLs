@@ -8,6 +8,8 @@
     <string name="add_dialog_title">请输入Deadline主题（必填）</string>
     <string name="add_dialog_info">请输入Deadline详细信息（选填）</string>
 
+    <string name="undo_delete_action">Undo</string>
+
     <string name="info_dialog_finish">Finish</string>
     <string name="info_dialog_delete">Delete</string>
     <string name="cancel">cancel</string>
