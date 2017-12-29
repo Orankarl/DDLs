@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+
+import org.litepal.crud.DataSupport;
 
 import java.util.Calendar;
 
@@ -42,6 +45,7 @@ public class DeadlineAdapter
     public interface onRefreshListener {
         void reloadDeadline();
         void undoDeleteDeadline(Deadline deadline);
+        void undoFinishDeadline(Deadline deadline, Long finishedDeadlineId);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -200,7 +204,13 @@ public class DeadlineAdapter
                                         break;
                                     }
                                     case POSITIVE:{
-
+                                        final Deadline permanentDeadline = DeadlineList.Companion.queryDeadline(id);
+                                        DeadlineList.Companion.deleteDeadline(id);
+                                        FinishedDeadline newFinishedDeadline = new FinishedDeadline(permanentDeadline, Calendar.getInstance().getTimeInMillis());
+                                        newFinishedDeadline.save();
+                                        Log.d("finishedCount", String.valueOf(DataSupport.count(FinishedDeadline.class)));
+                                        refreshListener.reloadDeadline();
+                                        refreshListener.undoFinishDeadline(permanentDeadline, newFinishedDeadline.getId());
                                         break;
                                     }
                                     default:break;

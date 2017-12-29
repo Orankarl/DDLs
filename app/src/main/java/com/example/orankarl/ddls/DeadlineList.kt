@@ -78,10 +78,6 @@ class DeadlineList() {
         }
     }
 
-    fun deleteDeadline(id:Long):Int {
-        return DataSupport.delete(Deadline::class.java, id)
-    }
-
     fun isEmpty():Boolean {
         return deadLineList.isEmpty()
     }

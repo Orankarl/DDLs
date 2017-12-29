@@ -9,10 +9,10 @@ import java.util.Comparator;
 
 public class NoticeComparator implements Comparator {
     public int compare(Object x, Object y) {
-        Calendar xcal = ((Notice) x).getCalendar();
-        Calendar ycal = ((Notice) y).getCalendar();
-        if (xcal.before(ycal)) return -1;
-        if (xcal.after(ycal)) return 1;
+        Long xmillis = ((Notice) x).getCalendarMillis();
+        Long ymillis = ((Notice) y).getCalendarMillis();
+        if (xmillis < ymillis) return -1;
+        else if (xmillis > ymillis) return 1;
         return 0;
     }
 

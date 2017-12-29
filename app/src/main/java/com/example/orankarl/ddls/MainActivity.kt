@@ -33,7 +33,7 @@ import org.litepal.crud.DataSupport
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, DeadlineFragment.CurrentUserNameListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, DeadlineFragment.DeadlineCurrentUserGetter, NoticeFragment.NoticeCurrentUserGetter {
 
 //    private lateinit var dialog:AddDeadlineDialog
     private lateinit var adapter:MainActivity.Adapter
@@ -82,27 +82,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 "组合数学作业",
                 "第十三次",
                 currentUser.username).save()
-
-        val deadline1 = Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
+        Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
                 "图形学大作业",
                 "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
-                currentUser.username)
-        deadline1.save()
-
-        val deadline2 = Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+                currentUser.username).save()
+        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
                 "数据库大作业",
                 "",
-                currentUser.username)
-        deadline2.save()
-
-        val deadline3 = Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+                currentUser.username).save()
+        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
                 "人工智能大作业",
                 "Building neural network by C++ (Without using any existing package).",
-                currentUser.username)
-        deadline3.save()
+                currentUser.username).save()
+
+        DataSupport.deleteAll(Notice::class.java)
+        Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser).save()
+        Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser).save()
+        Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser).save()
+        Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser).save()
+        Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser).save()
     }
 
-    public override fun getCurrentUser():User {
+    override fun getCurrentUserDeadline():User {
+        return currentUser
+    }
+
+    override fun getCurrentUserNotice(): User {
         return currentUser
     }
 

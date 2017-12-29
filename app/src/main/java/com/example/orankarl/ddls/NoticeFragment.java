@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.litepal.crud.DataSupport;
+
 import java.util.List;
 import java.util.Random;
 
@@ -30,6 +32,22 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private View view;
     private RecyclerView recyclerView;
     private NoticeList noticeList;
+
+    NoticeCurrentUserGetter currentUserGetter;
+
+    public interface NoticeCurrentUserGetter {
+        User getCurrentUserNotice();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            currentUserGetter = (NoticeCurrentUserGetter) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + "must implement getCurrentUserNotice");
+        }
+    }
 
     @Nullable
     @Override
@@ -48,15 +66,26 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         });
         noticeList = new NoticeList();
-        noticeList.loadNoticeList();
+        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
         setupRecyclerView(recyclerView);
         return view;
     }
 
     @Override
     public void onRefresh() {
+        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
         swipeRefreshLayout.setRefreshing(false);
-        Log.d("123", String.valueOf(noticeList.size()));
+        recyclerView = view.findViewById(R.id.notice_recyclerview);
+        TextView textView = view.findViewById(R.id.notice_empty_text);
+        if (noticeList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            textView.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.GONE);
+        }
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
@@ -67,7 +96,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private NoticeList getNoticeList() {
         NoticeList noticeList = new NoticeList();
-        noticeList.loadNoticeList();
+        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
         return noticeList;
     }
 

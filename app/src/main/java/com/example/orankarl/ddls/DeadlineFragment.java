@@ -32,6 +32,8 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.litepal.crud.DataSupport;
+
 import java.math.MathContext;
 import java.net.PasswordAuthentication;
 import java.util.Calendar;
@@ -53,19 +55,19 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public DeadlineList deadlineList;
 
-    CurrentUserNameListener currentUserNameListener;
+    DeadlineCurrentUserGetter currentUserListener;
 
-    public interface CurrentUserNameListener{
-        User getCurrentUser();
+    public interface DeadlineCurrentUserGetter{
+        User getCurrentUserDeadline();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            currentUserNameListener = (CurrentUserNameListener) context;
+            currentUserListener = (DeadlineCurrentUserGetter) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement currentUserName");
+            throw new ClassCastException(context.toString() + "must implement getCurrentUserDeadline");
         }
     }
 
@@ -78,10 +80,26 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void undoDeleteDeadline(final Deadline deadline) {
         final Deadline newDeadline = new Deadline(deadline);
         Snackbar.make(view, "Undo the delete action?", Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.undo_delete_action, new View.OnClickListener() {
+                .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         newDeadline.save();
+                        onRefresh();
+                    }
+                })
+                .show();
+    }
+
+    @Override
+    public void undoFinishDeadline(Deadline deadline, final Long finishedDeadlineId) {
+        final Deadline newDeadline = new Deadline(deadline);
+        Snackbar.make(view, "Undo the finish action?", Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        newDeadline.save();
+                        FinishedDeadlineList.Companion.deleteFinishedDeadline(finishedDeadlineId);
+                        Log.d("finishedCount", String.valueOf(DataSupport.count(FinishedDeadline.class)));
                         onRefresh();
                     }
                 })
@@ -105,17 +123,17 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         });
         deadlineList = new DeadlineList();
-        deadlineList.loadDeadlineList(currentUserNameListener.getCurrentUser());
+        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
         setupRecyclerView(recyclerView);
         return view;
     }
 
     @Override
     public void onRefresh() {
-        deadlineList.loadDeadlineList(currentUserNameListener.getCurrentUser());
+        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
         recyclerView.setAdapter((new DeadlineAdapter(getActivity(), deadlineList, this)));
         swipeRefreshLayout.setRefreshing(false);
-        RecyclerView recyclerView = view.findViewById(R.id.deadline_recyclerview);
+        recyclerView = view.findViewById(R.id.deadline_recyclerview);
         TextView textView = view.findViewById(R.id.deadline_empty_text);
         if (deadlineList.isEmpty()) {
             recyclerView.setVisibility(GONE);
@@ -134,7 +152,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private DeadlineList getDeadlineList() {
         DeadlineList deadlineList = new DeadlineList();
-        deadlineList.loadDeadlineList(currentUserNameListener.getCurrentUser());
+        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
         return deadlineList;
     }
 
