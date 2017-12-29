@@ -60,6 +60,14 @@ class DeadlineList() {
 //        Log.d("sort", )
     }
 
+    fun deleteItem(position: Int) {
+        deadLineList.removeAt(position)
+    }
+
+    fun addItem(position: Int, deadline: Deadline) {
+        deadLineList.add(position, deadline)
+    }
+
 
 
     fun get(position: Int):Deadline {

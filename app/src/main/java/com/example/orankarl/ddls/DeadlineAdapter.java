@@ -36,7 +36,7 @@ public class DeadlineAdapter
     private static final int VIEW_TYPE_MIDDLE = 1;
     private static final int VIEW_TYPE_BOTTOM = 2;
 
-    private DeadlineList values;
+    public DeadlineList values;
     private int background;
     private final TypedValue typedValue = new TypedValue();
 
@@ -44,8 +44,8 @@ public class DeadlineAdapter
 
     public interface onRefreshListener {
         void reloadDeadline();
-        void undoDeleteDeadline(Deadline deadline);
-        void undoFinishDeadline(Deadline deadline, Long finishedDeadlineId);
+        void undoDeleteDeadline(Deadline deadline, int position);
+        void undoFinishDeadline(Deadline deadline, Long finishedDeadlineId, int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -93,7 +93,7 @@ public class DeadlineAdapter
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         final Deadline deadline = values.get(position);
         final long id = deadline.getId();
         Calendar calendar = Calendar.getInstance();
@@ -183,6 +183,8 @@ public class DeadlineAdapter
         GradientDrawable gradientDrawable = (GradientDrawable) holder.rightStrip.getBackground();
         gradientDrawable.setColor(randomAndroidColor);
 
+        final DeadlineAdapter adapter = this;
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -199,8 +201,10 @@ public class DeadlineAdapter
                                     case NEUTRAL:{
                                         final Deadline permanentDeadline = DeadlineList.Companion.queryDeadline(id);
                                         DeadlineList.Companion.deleteDeadline(id);
-                                        refreshListener.reloadDeadline();
-                                        refreshListener.undoDeleteDeadline(permanentDeadline);
+                                        values.deleteItem(position);
+                                        adapter.notifyItemRemoved(position);
+                                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
+                                        refreshListener.undoDeleteDeadline(permanentDeadline, position);
                                         break;
                                     }
                                     case POSITIVE:{
@@ -208,9 +212,11 @@ public class DeadlineAdapter
                                         DeadlineList.Companion.deleteDeadline(id);
                                         FinishedDeadline newFinishedDeadline = new FinishedDeadline(permanentDeadline, Calendar.getInstance().getTimeInMillis());
                                         newFinishedDeadline.save();
-                                        Log.d("finishedCount", String.valueOf(DataSupport.count(FinishedDeadline.class)));
-                                        refreshListener.reloadDeadline();
-                                        refreshListener.undoFinishDeadline(permanentDeadline, newFinishedDeadline.getId());
+                                        values.deleteItem(position);
+                                        adapter.notifyItemRemoved(position);
+                                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
+//                                        refreshListener.reloadDeadline();
+                                        refreshListener.undoFinishDeadline(permanentDeadline, newFinishedDeadline.getId(), position);
                                         break;
                                     }
                                     default:break;

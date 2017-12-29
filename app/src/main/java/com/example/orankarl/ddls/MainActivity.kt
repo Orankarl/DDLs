@@ -165,6 +165,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             if (code == 0) {
                                 (fragment as DeadlineFragment).deadlineList.updateDeadlineList()
                                 (fragment as DeadlineFragment).onRefresh()
+//                                fragment.adapter.notifyItemRangeInserted(0, fragment.adapter.itemCount);
                                 Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
                             } else if (code == 1) {
                                 Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
@@ -181,7 +182,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
+            R.id.nav_finished -> {
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
@@ -191,12 +192,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
 
             }
         }
