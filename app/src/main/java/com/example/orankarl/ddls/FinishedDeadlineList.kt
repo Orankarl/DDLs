@@ -1,5 +1,7 @@
 package com.example.orankarl.ddls
 
+import android.util.Log
+import com.example.orankarl.ddls.R.drawable.user
 import org.litepal.crud.DataSupport
 import java.util.*
 
@@ -28,9 +30,9 @@ class FinishedDeadlineList {
         return 0
     }
 
-    fun loadFinishedDeadlineList(user:User) {
+    fun loadFinishedDeadlineList(username:String) {
         finishedDeadlineList.clear()
-        finishedDeadlineList = DataSupport.where("userName = ?", user.username).find(FinishedDeadline::class.java)
+        finishedDeadlineList = DataSupport.where("userName = ?", username).find(FinishedDeadline::class.java)
         Collections.sort(finishedDeadlineList, FinishedDeadlineComparator.INSTANCE)
     }
 

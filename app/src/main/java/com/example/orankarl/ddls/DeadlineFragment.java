@@ -87,7 +87,8 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     public void onClick(View view) {
                         newDeadline.save();
                         adapter.values.addItem(position, newDeadline);
-                        adapter.notifyDataSetChanged();
+                        onRefresh();
+//                        adapter.notifyDataSetChanged();
 //                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
                     }
                 })
@@ -104,7 +105,8 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                         newDeadline.save();
                         FinishedDeadlineList.Companion.deleteFinishedDeadline(finishedDeadlineId);
                         adapter.values.addItem(position, newDeadline);
-                        adapter.notifyDataSetChanged();
+                        onRefresh();
+//                        adapter.notifyDataSetChanged();
 //                        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
                     }
                 })

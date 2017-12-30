@@ -1,0 +1,107 @@
+package com.example.orankarl.ddls;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.util.Calendar;
+import java.util.List;
+
+
+/**
+ * Created by orankarl on 2017/12/29.
+ */
+
+public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadlineAdapter.ViewHolder> {
+
+    private final TypedValue typedValue = new TypedValue();
+    private int background;
+    private FinishedDeadlineList values;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public final View view;
+        public final TextView title, info, date, year;
+
+        public ViewHolder(View view) {
+            super(view);
+            this.view = view;
+            title = view.findViewById(R.id.finished_deadline_title);
+            info = view.findViewById(R.id.finished_deadline_info);
+            date = view.findViewById(R.id.finished_deadline_date);
+            year = view.findViewById(R.id.finished_deadline_year);
+        }
+    }
+
+    public FinishedDeadlineAdapter(Context context, FinishedDeadlineList finishedDeadlineList) {
+        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
+        background = typedValue.resourceId;
+        values = finishedDeadlineList;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.finished_deadline_item, parent, false);
+        view.setBackgroundResource(background);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final FinishedDeadline finishedDeadline = values.get(position);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(finishedDeadline.getCalendarMillis());
+        Calendar finishedCalendar = Calendar.getInstance();
+        finishedCalendar.setTimeInMillis(finishedDeadline.getFinishedMillis());
+        String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        if (month.length() == 1) month = "0" + month;
+        String date = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        if (date.length() == 1) date = "0" + date;
+        String year = String.valueOf(calendar.get(Calendar.YEAR));
+        holder.year.setText(year);
+        holder.date.setText(month+"."+date);
+        holder.title.setText(finishedDeadline.getTitle());
+        holder.info.setText(finishedDeadline.getInfo());
+
+        final String finishedDate = "完成日期：" + String.valueOf(finishedCalendar.get(Calendar.YEAR)) + "年"
+                + String.valueOf(finishedCalendar.get(Calendar.MONTH) + 1) + "月"
+                + String.valueOf(finishedCalendar.get(Calendar.DAY_OF_MONTH)) + "日\n";
+
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialDialog.Builder(view.getContext())
+                        .title(finishedDeadline.getTitle())
+                        .content(finishedDate + "\n详情：" + finishedDeadline.getInfo())
+                        .positiveText(R.string.finished_dialog_unfinished)
+                        .negativeText(R.string.cancel)
+                        .neutralText(R.string.info_dialog_delete)
+                        .onAny(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                switch (which) {
+                                    case NEUTRAL:
+                                        break;
+                                    case POSITIVE:
+                                        break;
+                                    default:break;
+                                }
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return values.size();
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.orankarl.ddls
 
+import android.content.Intent
 import android.os.Bundle
 import android.service.autofill.FillEventHistory
 import android.support.design.widget.Snackbar
@@ -183,6 +184,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_finished -> {
+                intent = Intent(this, FinishedDeadlineActivity::class.java)
+                intent.putExtra("CurrentUserName", currentUser.username);
+                startActivity(intent)
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
