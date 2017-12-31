@@ -20,11 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FinishedDeadlineActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/finished_deadline_tooltips">
-
-        </activity>
+        <activity
+            android:name=".FinishedDeadlineActivity"
+            android:label="@string/finished_deadline_tooltips"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".ChatActivity"></activity>
     </application>
 
 </manifest>
