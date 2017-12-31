@@ -91,7 +91,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         manager.deleteAll(Deadline::class.java)
-
         manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
                 "组合数学作业",
                 "第十三次",
@@ -108,6 +107,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 "人工智能大作业",
                 "Building neural network by C++ (Without using any existing package).",
                 currentUser.username))
+
+        manager.deleteAll(Notice::class.java)
+        var code = manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
+        Log.d("code", code.toString())
+        manager.insert(Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
+        manager.insert(Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
+        manager.insert(Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser.username))
+        manager.insert(Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
     }
 
     private fun initializeDatabase() {
@@ -140,12 +147,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                "Building neural network by C++ (Without using any existing package).",
 //                currentUser.username).save()
 
-        DataSupport.deleteAll(Notice::class.java)
-        Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser).save()
-        Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser).save()
-        Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser).save()
-        Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser).save()
-        Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser).save()
+//        DataSupport.deleteAll(Notice::class.java)
+//        Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser).save()
+//        Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser).save()
+//        Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser).save()
+//        Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser).save()
+//        Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser).save()
     }
 
     override fun getCurrentUserDeadline():User {

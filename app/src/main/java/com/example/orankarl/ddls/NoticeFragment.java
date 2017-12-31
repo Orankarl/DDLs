@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import org.litepal.crud.DataSupport;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -31,7 +32,8 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private SwipeRefreshLayout swipeRefreshLayout;
     private View view;
     private RecyclerView recyclerView;
-    private NoticeList noticeList;
+    private List<Notice> noticeList;
+    DatabaseManager manager;
 
     NoticeCurrentUserGetter currentUserGetter;
 
@@ -54,6 +56,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_notice, container,false);
         recyclerView = view.findViewById(R.id.notice_recyclerview);
+        manager = DatabaseManager.getInstance(this.getContext());
         swipeRefreshLayout = view.findViewById(R.id.notice_swiperefresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setProgressViewOffset(true, 0, 50);
@@ -65,15 +68,16 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 onRefresh();
             }
         });
-        noticeList = new NoticeList();
-        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
+        loadNoticeList();
+//        Log.d("notice", String.valueOf(noticeList.size()));
         setupRecyclerView(recyclerView);
         return view;
     }
 
     @Override
     public void onRefresh() {
-        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
+        loadNoticeList();
+//        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
         swipeRefreshLayout.setRefreshing(false);
@@ -94,17 +98,20 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
     }
 
-    private NoticeList getNoticeList() {
-        NoticeList noticeList = new NoticeList();
-        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
-        return noticeList;
+    private void loadNoticeList() {
+        if (manager != null) {
+//            noticeList = manager.queryNotice(currentUserGetter.getCurrentUserNotice().getUsername());
+            noticeList = manager.queryAll(Notice.class);
+            Collections.sort(noticeList, NoticeComparator.INSTANCE);
+            if (noticeList != null) Log.d("notice", String.valueOf(noticeList.size()));
+        }
     }
 
     public static class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecyclerViewAdapter.ViewHolder> {
 
         private final TypedValue typedValue = new TypedValue();
         private int background;
-        private NoticeList values;
+        private List<Notice> values;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public final LinearLayout topStrip;
@@ -129,7 +136,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         }
 
-        public SimpleRecyclerViewAdapter(Context context, NoticeList items) {
+        public SimpleRecyclerViewAdapter(Context context, List<Notice> items) {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
             background = typedValue.resourceId;
             values = items;
@@ -146,7 +153,7 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         public void onBindViewHolder(ViewHolder holder, int position) {
             Notice notice = values.get(position);
             holder.textView1.setText(notice.getTitle());
-            holder.textView2.setText(notice.getFrom());
+            holder.textView2.setText(notice.getCreator());
             holder.textView3.setText(notice.getInfo());
             int randomAndroidColor = holder.androidColors[position % holder.androidColors.length];
             GradientDrawable gradientDrawable = (GradientDrawable) holder.topStrip.getBackground();

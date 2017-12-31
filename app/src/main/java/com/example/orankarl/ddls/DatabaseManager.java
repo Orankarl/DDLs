@@ -77,6 +77,11 @@ public class DatabaseManager {
         .where("finished = ?", (Object[])new String[]{String.valueOf(isFinished)}));
     }
 
+    public List<Notice> queryNotice(String username) {
+        return liteOrm.query(new QueryBuilder<Notice>(Notice.class)
+        .where("username = ?", (Object[])new String[]{username}));
+    }
+
     @SuppressWarnings("unchecked")
     public <T> List<T> queryByWhereLength(Class<T> tClass, String field, String[] value, int start, int length) {
         return liteOrm.query(new QueryBuilder<T>(tClass).where(field + "=?", (Object[]) value).limit(start, length));
