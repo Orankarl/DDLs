@@ -1,5 +1,11 @@
 package com.example.orankarl.ddls;
 
+import com.litesuits.orm.db.annotation.Column;
+import com.litesuits.orm.db.annotation.NotNull;
+import com.litesuits.orm.db.annotation.PrimaryKey;
+import com.litesuits.orm.db.annotation.Table;
+import com.litesuits.orm.db.enums.AssignType;
+
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -8,10 +14,14 @@ import java.util.List;
 /**
  * Created by orankarl on 2017/12/28.
  */
-
-public class User extends DataSupport {
+@Table("tb_user")
+public class User{
+    @PrimaryKey(AssignType.AUTO_INCREMENT)
+    private int id;
+    @NotNull
+    @Column("username")
     private String username;
-    private List<Deadline> deadlineList = new ArrayList<Deadline>();
+//    private List<Deadline> deadlineList = new ArrayList<Deadline>();
 
     public String getUsername() {
         return username;
@@ -21,11 +31,19 @@ public class User extends DataSupport {
         this.username = username;
     }
 
-    public List<Deadline> getDeadlineList() {
-        return deadlineList;
+    public int getId() {
+        return id;
     }
 
-    public void setDeadlineList(List<Deadline> deadlineList) {
-        this.deadlineList = deadlineList;
+    public void setId(int id) {
+        this.id = id;
     }
+
+    //    public List<Deadline> getDeadlineList() {
+//        return deadlineList;
+//    }
+
+//    public void setDeadlineList(List<Deadline> deadlineList) {
+//        this.deadlineList = deadlineList;
+//    }
 }

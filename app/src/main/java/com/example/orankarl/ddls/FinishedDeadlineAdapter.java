@@ -24,7 +24,13 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
 
     private final TypedValue typedValue = new TypedValue();
     private int background;
-    public FinishedDeadlineList values;
+    public List<Deadline> values;
+    private DialogListener dialogListener;
+
+    public interface DialogListener {
+        void unfinishItem(final long id, final int position);
+        void deleteItem(final long id, final int position);
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
@@ -41,10 +47,11 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
         }
     }
 
-    public FinishedDeadlineAdapter(Context context, FinishedDeadlineList finishedDeadlineList) {
+    public FinishedDeadlineAdapter(Context context, List<Deadline> finishedDeadlineList, DialogListener listener) {
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
         background = typedValue.resourceId;
         values = finishedDeadlineList;
+        dialogListener = listener;
     }
 
     @Override
@@ -56,7 +63,7 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final FinishedDeadline finishedDeadline = values.get(position);
+        final Deadline finishedDeadline = values.get(position);
         holder.id = finishedDeadline.getId();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(finishedDeadline.getCalendarMillis());

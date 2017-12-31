@@ -25,22 +25,30 @@ import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
-public class FinishedDeadlineActivity extends AppCompatActivity {
+import java.util.Collections;
+import java.util.List;
+
+public class FinishedDeadlineActivity extends AppCompatActivity implements FinishedDeadlineAdapter.DialogListener {
 
     private RecyclerView recyclerView;
-    private FinishedDeadlineList deadlineList;
-    private User currentUser;
+    private List<Deadline> deadlineList;
+    private String currentUsername;
     private FinishedDeadlineAdapter adapter;
+    private DatabaseManager manager;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finished_deadline);
         recyclerView = findViewById(R.id.finished_deadline_recyclerview);
+        manager = DatabaseManager.getInstance(this);
         Intent intent = getIntent();
-        String username = intent.getStringExtra("CurrentUserName");
-        deadlineList = new FinishedDeadlineList();
-        deadlineList.loadFinishedDeadlineList(username);
+        currentUsername = intent.getStringExtra("CurrentUserName");
+//        deadlineList = new FinishedDeadlineList();
+//        deadlineList.loadFinishedDeadlineList(username);
+        loadDeadlineList();
         setRecyclerView(recyclerView);
         Toolbar toolbar = findViewById(R.id.finished_deadline_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_action_back_arrow);
@@ -62,7 +70,7 @@ public class FinishedDeadlineActivity extends AppCompatActivity {
 
     private void setRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new FinishedDeadlineAdapter(this, deadlineList);
+        adapter = new FinishedDeadlineAdapter(this, deadlineList, this);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -76,7 +84,7 @@ public class FinishedDeadlineActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition(); //swiped position
-                adapter.values.deleteItem(position);
+                adapter.values.remove(position);
                 adapter.notifyItemRemoved(position);
                 long id = -1;
                 if (viewHolder instanceof FinishedDeadlineAdapter.ViewHolder) {
@@ -84,21 +92,18 @@ public class FinishedDeadlineActivity extends AppCompatActivity {
                 }
 
                 if (direction == ItemTouchHelper.LEFT) { //swipe left
-                    unfinishItem(id, position);
-
-
-
+                    deleteItem(id, position);
 //                    yourarraylist.remove(position);
 //                    youradapter.notifyItemRemoved(position);
-
-                    Toast.makeText(getApplicationContext(),"Swipped to left",Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(),"Swipped to left",Toast.LENGTH_SHORT).show();
 
                 }else if(direction == ItemTouchHelper.RIGHT){//swipe right
+                    unfinishItem(id, position);
 
 //                    yourarraylist.remove(position);
 //                    youradapter.notifyItemRemoved(position);
 
-                    Toast.makeText(getApplicationContext(),"Swipped to right",Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(),"Swipped to right",Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -188,27 +193,58 @@ public class FinishedDeadlineActivity extends AppCompatActivity {
 
     }
 
-    private void unfinishItem(long id, final int position) {
-//        final FinishedDeadline finishedDeadline = new FinishedDeadline(FinishedDeadlineList.Companion.queryDeadline(id));
+    public void unfinishItem(final long id, final int position) {
+        if (manager != null) {
+            final Deadline finishedDeadline = manager.queryById(Deadline.class, id);
+            finishedDeadline.setFinished(false);
+            manager.update(finishedDeadline);
+            Log.d("unfinish", String.valueOf(manager.queryDeadline(currentUsername, false)));
+//            FinishedDeadlineList.Companion.deleteFinishedDeadline(id);
+            Snackbar.make(getWindow().getDecorView().getRootView(), "Undo the unfinish action?", Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.undo, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Deadline deadline = manager.queryById(Deadline.class, id);
+                            deadline.setFinished(true);
+                            manager.update(deadline);
+//                            DeadlineList.Companion.deleteDeadline(deadlineId);
+                            adapter.values.add(position, deadline);
+                            adapter.notifyItemInserted(position);
+                        }
+                    })
+                    .show();
+        }
 //        Deadline deadline = new Deadline(finishedDeadline);
-//        deadline.save();
 //        final long deadlineId = deadline.getId();
-//        FinishedDeadlineList.Companion.deleteFinishedDeadline(id);
-//        Snackbar.make(getWindow().getDecorView().getRootView(), "Undo the unfinish action?", Snackbar.LENGTH_INDEFINITE)
-//                .setAction(R.string.undo, new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        DeadlineList.Companion.deleteDeadline(deadlineId);
-//                        adapter.values.addItem(position, finishedDeadline);
-//                        adapter.notifyItemInserted(position);
-//                    }
-//                })
-//                .show();
+    }
+
+    public void deleteItem(final long id, final int position) {
+        if (manager != null) {
+            final Deadline finishedDeadline = manager.queryById(Deadline.class, id);
+            manager.delete(finishedDeadline);
+            Snackbar.make(getWindow().getDecorView().getRootView(), "Undo the unfinish action?", Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.undo, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            manager.insert(finishedDeadline);
+//                            DeadlineList.Companion.deleteDeadline(deadlineId);
+                            adapter.values.add(position, finishedDeadline);
+                            adapter.notifyItemInserted(position);
+                        }
+                    })
+                    .show();
+        }
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    public void loadDeadlineList() {
+        if (manager != null)
+        deadlineList = manager.queryDeadline(currentUsername, true);
+        Collections.sort(deadlineList, FinishedDeadlineComparator.INSTANCE);
     }
 }

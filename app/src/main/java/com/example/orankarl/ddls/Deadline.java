@@ -1,20 +1,37 @@
 package com.example.orankarl.ddls;
 
+import com.litesuits.orm.db.annotation.Column;
+import com.litesuits.orm.db.annotation.Default;
+import com.litesuits.orm.db.annotation.NotNull;
+import com.litesuits.orm.db.annotation.PrimaryKey;
+import com.litesuits.orm.db.annotation.Table;
+import com.litesuits.orm.db.enums.AssignType;
+
 import org.litepal.crud.DataSupport;
 
 import java.util.Calendar;
 
+import kotlin.Function;
+
 /**
  * Created by orankarl on 2017/12/28.
  */
-
-public class Deadline extends DataSupport {
+@Table("tb_deadline")
+public class Deadline {
+    @PrimaryKey(AssignType.AUTO_INCREMENT)
     private long id;
+    @NotNull
     private long calendarMillis;
+    @Column("finishedMillis")
+    private long finishedMillis;
+    @NotNull
     private String title;
     private String info;
+    @Column("username")
     private String userName;
-    private int test;
+    @Column("finished")
+    @Default("false")
+    private boolean finished;
 
     public Deadline(long calendarMillis, String title, String info, String userName) {
         this.calendarMillis = calendarMillis;
@@ -37,6 +54,22 @@ public class Deadline extends DataSupport {
         this.title = finishedDeadline.getTitle();
         this.info = finishedDeadline.getInfo();
         this.userName = finishedDeadline.getUserName();
+    }
+
+    public long getFinishedMillis() {
+        return finishedMillis;
+    }
+
+    public void setFinishedMillis(long finishedMillis) {
+        this.finishedMillis = finishedMillis;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     public long getId() {

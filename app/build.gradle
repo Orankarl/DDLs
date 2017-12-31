@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
@@ -32,12 +32,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:0.5'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
-
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation 'de.hdodenhof:circleimageview:1.3.0'
     compile 'com.afollestad.material-dialogs:core:0.9.6.0'
     compile 'org.litepal.android:core:1.6.1'
-
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.android.support:animated-vector-drawable:26.1.0'
+    implementation files('F:/Android/DDLs/libs/lite-orm-1.9.2.jar')
 }

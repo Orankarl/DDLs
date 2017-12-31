@@ -49,7 +49,7 @@ class DeadlineList() {
         if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1) return 2
 //        deadLineList.add(Deadline(calendar, title, info))
         val deadline = Deadline(calendar.timeInMillis, title, info, user.username)
-        deadline.save()
+//        deadline.save()
         return 0
     }
 

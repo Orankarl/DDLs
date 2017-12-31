@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -23,6 +24,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import org.litepal.crud.DataSupport;
 
 import java.util.Calendar;
+import java.util.List;
 
 import static android.view.View.GONE;
 
@@ -36,7 +38,7 @@ public class DeadlineAdapter
     private static final int VIEW_TYPE_MIDDLE = 1;
     private static final int VIEW_TYPE_BOTTOM = 2;
 
-    public DeadlineList values;
+    public List<Deadline> values;
     private int background;
     private final TypedValue typedValue = new TypedValue();
 
@@ -45,7 +47,7 @@ public class DeadlineAdapter
     public interface onRefreshListener {
         void reloadDeadline();
         void undoDeleteDeadline(Deadline deadline, int position);
-        void undoFinishDeadline(Deadline deadline, Long finishedDeadlineId, int position);
+        void undoFinishDeadline(Long finishedDeadlineId, int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -78,7 +80,7 @@ public class DeadlineAdapter
         }
     }
 
-    public DeadlineAdapter(Context context, DeadlineList deadlineList, onRefreshListener listener) {
+    public DeadlineAdapter(Context context, List<Deadline> deadlineList, onRefreshListener listener) {
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
         background = typedValue.resourceId;
         values = deadlineList;
@@ -197,26 +199,37 @@ public class DeadlineAdapter
                         .onAny(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                DatabaseManager manager = DatabaseManager.getInstance(view.getContext());
                                 switch (which) {
                                     case NEUTRAL:{
-                                        final Deadline permanentDeadline = DeadlineList.Companion.queryDeadline(id);
-                                        DeadlineList.Companion.deleteDeadline(id);
-                                        values.deleteItem(position);
+                                        final Deadline permanentDeadline = manager.queryById(Deadline.class, id);
+                                        manager.delete(permanentDeadline);
+//                                        final Deadline permanentDeadline = DeadlineList.Companion.queryDeadline(id);
+//                                        DeadlineList.Companion.deleteDeadline(id);
+                                        values.remove(position);
                                         adapter.notifyItemRemoved(position);
                                         adapter.notifyItemRangeChanged(position, adapter.getItemCount());
                                         refreshListener.undoDeleteDeadline(permanentDeadline, position);
                                         break;
                                     }
                                     case POSITIVE:{
-                                        final Deadline permanentDeadline = DeadlineList.Companion.queryDeadline(id);
-                                        DeadlineList.Companion.deleteDeadline(id);
-                                        FinishedDeadline newFinishedDeadline = new FinishedDeadline(permanentDeadline, Calendar.getInstance().getTimeInMillis());
-                                        newFinishedDeadline.save();
-                                        values.deleteItem(position);
+                                        final Deadline permanentDeadline = manager.queryById(Deadline.class, id);
+                                        permanentDeadline.setFinished(true);
+                                        Calendar calendar2 = Calendar.getInstance();
+                                        permanentDeadline.setFinishedMillis(calendar2.getTimeInMillis());
+                                        if (manager != null)
+                                            manager.update(permanentDeadline);
+                                        values.remove(position);
                                         adapter.notifyItemRemoved(position);
                                         adapter.notifyItemRangeChanged(position, adapter.getItemCount());
+                                        refreshListener.undoFinishDeadline(id, position);
+//                                        DeadlineList.Companion.deleteDeadline(id);
+//                                        FinishedDeadline newFinishedDeadline = new FinishedDeadline(permanentDeadline, Calendar.getInstance().getTimeInMillis());
+//                                        values.remove(position);
+//                                        adapter.notifyItemRemoved(position);
+//                                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
 //                                        refreshListener.reloadDeadline();
-                                        refreshListener.undoFinishDeadline(permanentDeadline, newFinishedDeadline.getId(), position);
+//                                        refreshListener.undoFinishDeadline(permanentDeadline, newFinishedDeadline.getId(), position);
                                         break;
                                     }
                                     default:break;
@@ -241,6 +254,7 @@ public class DeadlineAdapter
 
     @Override
     public int getItemCount() {
+        if (values == null) return 0;
         return values.size();
     }
 }

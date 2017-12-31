@@ -1,7 +1,10 @@
 package com.example.orankarl.ddls
 
+import android.app.ProgressDialog.show
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.service.autofill.FillEventHistory
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -19,6 +22,7 @@ import android.view.View
 import android.widget.Adapter
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.app.FragmentTransaction
+import android.support.v4.content.ContextCompat.startActivity
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.TextView
@@ -39,6 +43,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //    private lateinit var dialog:AddDeadlineDialog
     private lateinit var adapter:MainActivity.Adapter
     private lateinit var currentUser:User
+    private lateinit var manager:DatabaseManager
+    private lateinit var pref:SharedPreferences
+    private lateinit var editor:SharedPreferences.Editor
+    private lateinit var lastUsername:String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +64,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupViewPager(viewpager)
         tabs.setupWithViewPager(viewpager)
 
-        initializeDatabase()
+        initDatabase()
     }
 
     private fun setupViewPager(viewPager: ViewPager) {
@@ -66,24 +75,58 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         viewPager.adapter = adapter
     }
 
-    private fun initializeDatabase() {
-        LitePal.getDatabase()
-        var userList:List<User> = DataSupport.where("username == ?", "local").find(User::class.java)
-        if (userList.isEmpty()) {
-            var user = User()
-            user.username = "local"
-            user.save()
-            currentUser = user
+    private fun initDatabase() {
+        pref = PreferenceManager.getDefaultSharedPreferences(this)
+        lastUsername = pref.getString("username", "local")
+        manager = DatabaseManager.getInstance(this.applicationContext)
+        var users = manager.queryAll(User::class.java)
+        if (users.isEmpty()) {
+            currentUser = User()
+            currentUser.username = lastUsername
+            manager.insert(currentUser)
+        } else if(users.size == 1) {
+            currentUser = manager.queryByWhere(User::class.java, "username", Array<String>(1){"local"})[0]
         } else {
-            currentUser = userList[0]
+            currentUser = manager.queryByWhere(User::class.java, "username", Array(1){lastUsername})[0]
         }
 
-        DataSupport.deleteAll(Deadline::class.java)
-        DataSupport.deleteAll(FinishedDeadline::class.java)
-        Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
+        manager.deleteAll(Deadline::class.java)
+
+        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
                 "组合数学作业",
                 "第十三次",
-                currentUser.username).save()
+                currentUser.username))
+        manager.insert(Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
+                "图形学大作业",
+                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
+                currentUser.username))
+        manager.insert(Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+                "数据库大作业",
+                "",
+                currentUser.username))
+        manager.insert(Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+                "人工智能大作业",
+                "Building neural network by C++ (Without using any existing package).",
+                currentUser.username))
+    }
+
+    private fun initializeDatabase() {
+//        LitePal.getDatabase()
+//        var userList:List<User> = DataSupport.where("username == ?", "local").find(User::class.java)
+//        if (userList.isEmpty()) {
+//            var user = User()
+//            user.username = "local"
+//            currentUser = user
+//        } else {
+//            currentUser = userList[0]
+//        }
+//
+//        DataSupport.deleteAll(Deadline::class.java)
+//        DataSupport.deleteAll(FinishedDeadline::class.java)
+//        Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
+//                "组合数学作业",
+//                "第十三次",
+//                currentUser.username).save()
 //        Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
 //                "图形学大作业",
 //                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
@@ -163,16 +206,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val fragmentManager = supportFragmentManager
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
-                            val code = (fragment as DeadlineFragment).deadlineList.add(calendar, title.text.toString(), info.text.toString(), currentUser)
-                            if (code == 0) {
-                                (fragment as DeadlineFragment).deadlineList.updateDeadlineList()
-                                (fragment as DeadlineFragment).onRefresh()
-//                                fragment.adapter.notifyItemRangeInserted(0, fragment.adapter.itemCount);
-                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
-                            } else if (code == 1) {
+                            val calendar1 = Calendar.getInstance()
+                            val deadline = Deadline(calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username)
+                            if (title.text.isEmpty()) {
                                 Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
-                            } else if (code == 2) {
+                            }
+                            else if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1)
                                 Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
+                            else {
+                                manager.insert(deadline)
+                                fragment.onRefresh()
+                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
                             }
 
                         }
@@ -203,6 +247,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        val fragmentManager = supportFragmentManager
+        for (fragment in fragmentManager.fragments) {
+            if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
+                fragment.onRefresh()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val fragmentManager = supportFragmentManager
+        for (fragment in fragmentManager.fragments) {
+            if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
+                fragment.onRefresh()
+            }
+        }
     }
 
     internal class Adapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

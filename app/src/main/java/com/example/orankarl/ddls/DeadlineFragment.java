@@ -31,12 +31,16 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.load.resource.NullDecoder;
 
 import org.litepal.crud.DataSupport;
 
+import java.lang.reflect.Array;
 import java.math.MathContext;
 import java.net.PasswordAuthentication;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -54,8 +58,8 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     private View view;
     private RecyclerView recyclerView;
     public DeadlineAdapter adapter;
-
-    public DeadlineList deadlineList;
+    public List<Deadline> deadlineList;
+    private DatabaseManager manager;
 
     DeadlineCurrentUserGetter currentUserListener;
 
@@ -85,8 +89,10 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        newDeadline.save();
-                        adapter.values.addItem(position, newDeadline);
+                        if (manager != null) {
+                            manager.insert(newDeadline);
+                        }
+                        adapter.values.add(position, newDeadline);
                         onRefresh();
 //                        adapter.notifyDataSetChanged();
 //                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
@@ -96,16 +102,25 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void undoFinishDeadline(Deadline deadline, final Long finishedDeadlineId, final int position) {
-        final Deadline newDeadline = new Deadline(deadline);
+    public void undoFinishDeadline(final Long finishedDeadlineId, final int position) {
         Snackbar.make(view, "Undo the finish action?", Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        newDeadline.save();
-                        FinishedDeadlineList.Companion.deleteFinishedDeadline(finishedDeadlineId);
-                        adapter.values.addItem(position, newDeadline);
-                        onRefresh();
+                        manager = DatabaseManager.getInstance(getContext());
+                        if (manager != null) {
+                            Deadline deadline = manager.queryById(Deadline.class, finishedDeadlineId);
+                            if (deadline != null) {
+                                deadline.setFinished(false);
+                            }
+                            manager.update(deadline);
+                            adapter.values.add(position, deadline);
+                            onRefresh();
+                        }
+//                        newDeadline.save();
+//                        FinishedDeadlineList.Companion.deleteFinishedDeadline(finishedDeadlineId);
+//                        adapter.values.addItem(position, newDeadline);
+//                        onRefresh();
 //                        adapter.notifyDataSetChanged();
 //                        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
                     }
@@ -129,15 +144,17 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 onRefresh();
             }
         });
-        deadlineList = new DeadlineList();
-        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
+        loadDeadlineList();
         setupRecyclerView(recyclerView);
+
+        manager = DatabaseManager.getInstance(this.getContext());
         return view;
     }
 
     @Override
     public void onRefresh() {
-        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
+        loadDeadlineList();
+//        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
         adapter = new DeadlineAdapter(getActivity(), deadlineList, this);
         recyclerView.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
@@ -156,6 +173,15 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter((new DeadlineAdapter(getActivity(), deadlineList, this)));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    private void loadDeadlineList() {
+        User currentUser = currentUserListener.getCurrentUserDeadline();
+        if (manager != null) {
+            deadlineList = manager.queryDeadline(currentUser.getUsername(), false);
+//            deadlineList = manager.queryByWhere(Deadline.class, "username", args);
+            Collections.sort(deadlineList, DeadlineComparator.INSTANCE);
+        }
     }
 
 

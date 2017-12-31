@@ -8,8 +8,8 @@ import java.util.Comparator;
 
 public class FinishedDeadlineComparator implements Comparator{
     public int compare(Object x, Object y) {
-        if (((FinishedDeadline) x).getFinishedMillis() < ((FinishedDeadline) y).getFinishedMillis()) return -1;
-        else if (((FinishedDeadline) x).getFinishedMillis() > ((FinishedDeadline) y).getFinishedMillis()) return 1;
+        if (((Deadline) x).getFinishedMillis() < ((Deadline) y).getFinishedMillis()) return -1;
+        else if (((Deadline) x).getFinishedMillis() > ((Deadline) y).getFinishedMillis()) return 1;
         return 0;
     }
 
