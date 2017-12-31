@@ -79,22 +79,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         DataSupport.deleteAll(Deadline::class.java)
+        DataSupport.deleteAll(FinishedDeadline::class.java)
         Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
                 "组合数学作业",
                 "第十三次",
                 currentUser.username).save()
-        Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
-                "图形学大作业",
-                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
-                currentUser.username).save()
-        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
-                "数据库大作业",
-                "",
-                currentUser.username).save()
-        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
-                "人工智能大作业",
-                "Building neural network by C++ (Without using any existing package).",
-                currentUser.username).save()
+//        Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
+//                "图形学大作业",
+//                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
+//                currentUser.username).save()
+//        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+//                "数据库大作业",
+//                "",
+//                currentUser.username).save()
+//        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+//                "人工智能大作业",
+//                "Building neural network by C++ (Without using any existing package).",
+//                currentUser.username).save()
 
         DataSupport.deleteAll(Notice::class.java)
         Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser).save()

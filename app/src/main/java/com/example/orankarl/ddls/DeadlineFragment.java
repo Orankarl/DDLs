@@ -158,11 +158,6 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
-    private DeadlineList getDeadlineList() {
-        DeadlineList deadlineList = new DeadlineList();
-        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
-        return deadlineList;
-    }
 
 
 }

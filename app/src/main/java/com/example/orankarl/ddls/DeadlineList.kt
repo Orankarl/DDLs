@@ -55,7 +55,9 @@ class DeadlineList() {
 
     fun loadDeadlineList(user:User) {
         deadLineList.clear()
-        deadLineList = DataSupport.where("userName = ?", user.username).find(Deadline::class.java)
+        Log.d("123", DataSupport.count(Deadline::class.java).toString())
+//        deadLineList = DataSupport.findAll(Deadline::class.java)
+//        deadLineList = DataSupport.where("userName = ?", user.username).find(Deadline::class.java)
         Collections.sort(deadLineList, DeadlineComparator.INSTANCE)
 //        Log.d("sort", )
     }

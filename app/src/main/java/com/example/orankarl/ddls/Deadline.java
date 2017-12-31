@@ -14,6 +14,7 @@ public class Deadline extends DataSupport {
     private String title;
     private String info;
     private String userName;
+    private int test;
 
     public Deadline(long calendarMillis, String title, String info, String userName) {
         this.calendarMillis = calendarMillis;
@@ -28,6 +29,14 @@ public class Deadline extends DataSupport {
         this.title = deadline.getTitle();
         this.info = deadline.getInfo();
         this.userName = deadline.getUserName();
+    }
+
+    public Deadline(FinishedDeadline finishedDeadline) {
+        this.id = finishedDeadline.getId();
+        this.calendarMillis = finishedDeadline.getCalendarMillis();
+        this.title = finishedDeadline.getTitle();
+        this.info = finishedDeadline.getInfo();
+        this.userName = finishedDeadline.getUserName();
     }
 
     public long getId() {

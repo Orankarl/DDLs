@@ -24,11 +24,12 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
 
     private final TypedValue typedValue = new TypedValue();
     private int background;
-    private FinishedDeadlineList values;
+    public FinishedDeadlineList values;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView title, info, date, year;
+        public long id;
 
         public ViewHolder(View view) {
             super(view);
@@ -54,8 +55,9 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         final FinishedDeadline finishedDeadline = values.get(position);
+        holder.id = finishedDeadline.getId();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(finishedDeadline.getCalendarMillis());
         Calendar finishedCalendar = Calendar.getInstance();
@@ -70,16 +72,16 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
         holder.title.setText(finishedDeadline.getTitle());
         holder.info.setText(finishedDeadline.getInfo());
 
-        final String finishedDate = "完成日期：" + String.valueOf(finishedCalendar.get(Calendar.YEAR)) + "年"
+        final String finishedDate = String.valueOf(finishedCalendar.get(Calendar.YEAR)) + "年"
                 + String.valueOf(finishedCalendar.get(Calendar.MONTH) + 1) + "月"
                 + String.valueOf(finishedCalendar.get(Calendar.DAY_OF_MONTH)) + "日\n";
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new MaterialDialog.Builder(view.getContext())
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getContext())
                         .title(finishedDeadline.getTitle())
-                        .content(finishedDate + "\n详情：" + finishedDeadline.getInfo())
+                        .customView(R.layout.finished_deadline_dialog, true)
                         .positiveText(R.string.finished_dialog_unfinished)
                         .negativeText(R.string.cancel)
                         .neutralText(R.string.info_dialog_delete)
@@ -94,8 +96,17 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
                                     default:break;
                                 }
                             }
-                        })
-                        .show();
+                        });
+                MaterialDialog dialog = builder.build();
+                View view1 = dialog.getCustomView();
+                if (view1 != null) {
+                    TextView textView1 = view1.findViewById(R.id.finished_dialog_date);
+                    TextView textView2 = view1.findViewById(R.id.finished_dialog_info);
+                    textView1.setText(finishedDate);
+                    textView2.setText(finishedDeadline.getInfo());
+                }
+                dialog.show();
+
             }
         });
     }

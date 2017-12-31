@@ -43,4 +43,12 @@ class FinishedDeadlineList {
     fun size():Int {
         return finishedDeadlineList.size
     }
+
+    fun addItem(position:Int, finishedDeadline: FinishedDeadline) {
+        finishedDeadlineList.add(position, finishedDeadline)
+    }
+
+    fun deleteItem(position:Int) {
+        finishedDeadlineList.removeAt(position)
+    }
 }
