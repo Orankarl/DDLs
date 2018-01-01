@@ -19,6 +19,15 @@ public class Course {
     private String latestName;
     private String latestMsg;
 
+    Course(long id, String title, String username, long time, String latestName, String latestMsg) {
+        this.course_id = id;
+        this.time = time;
+        this.title = title;
+        this.username = username;
+        this.latestMsg = latestMsg;
+        this.latestName = latestName;
+    }
+
     public long getId() {
         return id;
     }

@@ -87,6 +87,18 @@ public class DatabaseManager {
         .where("username = ?", (Object[]) new String[]{username}));
     }
 
+    public List<Msg> queryMsg(String username, long course_id) {
+        return liteOrm.query(new QueryBuilder<Msg>(Msg.class)
+        .where("username = ?", (Object[]) new String[]{username})
+        .whereAppendAnd()
+        .where("course_id = ?", course_id));
+    }
+
+    public List<Course> queryCourseById(long course_id) {
+        return liteOrm.query(new QueryBuilder<Course>(Course.class)
+        .where("course_id = ?", course_id));
+    }
+
     @SuppressWarnings("unchecked")
     public <T> List<T> queryByWhereLength(Class<T> tClass, String field, String[] value, int start, int length) {
         return liteOrm.query(new QueryBuilder<T>(tClass).where(field + "=?", (Object[]) value).limit(start, length));

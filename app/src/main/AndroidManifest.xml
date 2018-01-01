@@ -23,8 +23,13 @@
         <activity
             android:name=".FinishedDeadlineActivity"
             android:label="@string/finished_deadline_tooltips"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".ChatActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity android:name=".ChatActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
     </application>
 
 </manifest>

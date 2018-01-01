@@ -110,12 +110,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 currentUser.username))
 
         manager.deleteAll(Notice::class.java)
-        var code = manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
-        Log.d("code", code.toString())
+        manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
         manager.insert(Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
         manager.insert(Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
         manager.insert(Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser.username))
         manager.insert(Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
+
+        manager.deleteAll(Course::class.java)
+        manager.insert(Course(1, "人工智能", currentUser.username, Calendar.getInstance().timeInMillis, "A", "你好"))
+        manager.insert(Course(2, "数据库系统原理", currentUser.username, Calendar.getInstance().timeInMillis, "B", "新年快乐"))
+        manager.insert(Course(3, "高性能计算", currentUser.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候"))
+        manager.insert(Course(4, "计算机图形学", currentUser.username, Calendar.getInstance().timeInMillis, "D", "还行"))
+
+        manager.deleteAll(Msg::class.java)
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "C", "你好", Msg.LEFT));
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "B", "你好", Msg.LEFT));
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "A", "你好", Msg.LEFT));
+
     }
 
     private fun initializeDatabase() {

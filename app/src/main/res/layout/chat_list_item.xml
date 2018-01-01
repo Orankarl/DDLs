@@ -16,13 +16,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <TextView
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed"
             android:id="@+id/text1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"/>
         
         <TextView
+            android:textSize="14sp"
+            android:maxLines="1"
             android:id="@+id/text2"
+            android:layout_marginTop="2dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />

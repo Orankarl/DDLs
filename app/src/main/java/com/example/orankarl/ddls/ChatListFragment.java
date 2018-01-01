@@ -1,5 +1,6 @@
 package com.example.orankarl.ddls;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.DrmInitData;
@@ -12,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private DatabaseManager manager;
     private static final int NAME_MAX_LEN = 8;
     ChatCurrentUserListener chatCurrentUserListener;
+    RecyclerView recyclerView;
 
     public interface ChatCurrentUserListener {
         User getCurrentUserChat();
@@ -53,7 +56,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_chat_list, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.chat_list_recyclerview);
+        recyclerView = view.findViewById(R.id.chat_list_recyclerview);
         swipeRefreshLayout = view.findViewById(R.id.chat_list_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setProgressViewOffset(true, 0, 50);
@@ -72,6 +75,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void onRefresh() {
+        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), getChatList())));
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -102,6 +106,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
             public final ImageView imageView;
             public final TextView textView1;
             public final TextView textView2;
+            public long course_id;
 
             public ViewHolder(View view) {
                 super(view);
@@ -132,15 +137,26 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Course item = mValues.get(position);
+            final Course item = mValues.get(position);
             holder.mBoundString = item.getTitle();
             holder.textView1.setText(item.getTitle());
             String name = item.getLatestName();
             if (name.length() > NAME_MAX_LEN) name = name.substring(0, NAME_MAX_LEN-2) + "..";
-            String message = item.getLatestName();
+            String message = item.getLatestMsg();
             holder.textView2.setText(name + ": " + message);
 
-//            holder.mView.setOnClickListerner
+            holder.course_id = item.getCourse_id();
+
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Activity activity = (Activity)view.getContext();
+                    Intent intent = new Intent(activity, ChatActivity.class);
+                    intent.putExtra("course_id", item.getCourse_id());
+                    intent.putExtra("current_username", item.getUsername());
+                    activity.startActivity(intent);
+                }
+            });
 
             Glide.with(holder.imageView.getContext())
                     .load(R.drawable.user)
@@ -150,7 +166,9 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            if (mValues != null)
+                return mValues.size();
+            return 0;
         }
     }
 }
