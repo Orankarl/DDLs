@@ -31,7 +31,24 @@ import java.util.List;
 public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     private SwipeRefreshLayout swipeRefreshLayout;
     private View view;
+    private DatabaseManager manager;
     private static final int NAME_MAX_LEN = 8;
+    ChatCurrentUserListener chatCurrentUserListener;
+
+    public interface ChatCurrentUserListener {
+        User getCurrentUserChat();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            chatCurrentUserListener = (ChatCurrentUserListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + "must implement getCurrentUserChat");
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,6 +66,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         });
         setupRecyclerView(recyclerView);
+        manager = DatabaseManager.getInstance(this.getContext());
         return view;
     }
 
@@ -63,17 +81,19 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
         recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
     }
 
-    private ChatList getChatList() {
-        ChatList chatList = new ChatList();
-        chatList.loadChatList();
-        return chatList;
+    private List<Course> getChatList() {
+        if (manager != null) {
+            List<Course> chatList = manager.queryCourse(chatCurrentUserListener.getCurrentUserChat().getUsername());
+            return chatList;
+        }
+        return null;
     }
 
     public static class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
 
         private final TypedValue mTypedValue = new TypedValue();
         private int mBackground;
-        private ChatList mValues;
+        private List<Course> mValues;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public String mBoundString; //for intent
@@ -97,7 +117,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
-        public SimpleStringRecyclerViewAdapter(Context context, ChatList items) {
+        public SimpleStringRecyclerViewAdapter(Context context, List<Course> items) {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
             mValues = items;
@@ -112,12 +132,12 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            ChatItem item = mValues.get(position);
+            Course item = mValues.get(position);
             holder.mBoundString = item.getTitle();
             holder.textView1.setText(item.getTitle());
-            String name = item.getLatestSender();
+            String name = item.getLatestName();
             if (name.length() > NAME_MAX_LEN) name = name.substring(0, NAME_MAX_LEN-2) + "..";
-            String message = item.getLatestMessage();
+            String message = item.getLatestName();
             holder.textView2.setText(name + ": " + message);
 
 //            holder.mView.setOnClickListerner

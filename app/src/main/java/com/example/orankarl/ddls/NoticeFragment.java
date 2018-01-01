@@ -100,8 +100,8 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void loadNoticeList() {
         if (manager != null) {
-//            noticeList = manager.queryNotice(currentUserGetter.getCurrentUserNotice().getUsername());
-            noticeList = manager.queryAll(Notice.class);
+            noticeList = manager.queryNotice(currentUserGetter.getCurrentUserNotice().getUsername());
+//            noticeList = manager.queryAll(Notice.class);
             Collections.sort(noticeList, NoticeComparator.INSTANCE);
             if (noticeList != null) Log.d("notice", String.valueOf(noticeList.size()));
         }

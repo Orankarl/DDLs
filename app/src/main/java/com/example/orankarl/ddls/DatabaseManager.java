@@ -82,6 +82,11 @@ public class DatabaseManager {
         .where("username = ?", (Object[])new String[]{username}));
     }
 
+    public List<Course> queryCourse(String username) {
+        return liteOrm.query(new QueryBuilder<Course>(Course.class)
+        .where("username = ?", (Object[]) new String[]{username}));
+    }
+
     @SuppressWarnings("unchecked")
     public <T> List<T> queryByWhereLength(Class<T> tClass, String field, String[] value, int start, int length) {
         return liteOrm.query(new QueryBuilder<T>(tClass).where(field + "=?", (Object[]) value).limit(start, length));

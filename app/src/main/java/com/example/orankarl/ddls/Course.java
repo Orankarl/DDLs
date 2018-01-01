@@ -12,9 +12,12 @@ public class Course {
     @PrimaryKey(AssignType.AUTO_INCREMENT)
     private long id;
     private long course_id;
+    private String title;
     private long user_id;
     private String username;
     private long time;
+    private String latestName;
+    private String latestMsg;
 
     public long getId() {
         return id;
@@ -50,5 +53,29 @@ public class Course {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getLatestName() {
+        return latestName;
+    }
+
+    public void setLatestName(String latestName) {
+        this.latestName = latestName;
+    }
+
+    public String getLatestMsg() {
+        return latestMsg;
+    }
+
+    public void setLatestMsg(String latestMsg) {
+        this.latestMsg = latestMsg;
     }
 }

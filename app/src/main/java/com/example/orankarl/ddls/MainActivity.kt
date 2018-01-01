@@ -38,7 +38,8 @@ import org.litepal.crud.DataSupport
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, DeadlineFragment.DeadlineCurrentUserGetter, NoticeFragment.NoticeCurrentUserGetter {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+        DeadlineFragment.DeadlineCurrentUserGetter, NoticeFragment.NoticeCurrentUserGetter, ChatListFragment.ChatCurrentUserListener {
 
 //    private lateinit var dialog:AddDeadlineDialog
     private lateinit var adapter:MainActivity.Adapter
@@ -160,6 +161,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun getCurrentUserNotice(): User {
+        return currentUser
+    }
+
+    override fun getCurrentUserChat(): User {
         return currentUser
     }
 
