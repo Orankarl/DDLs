@@ -8,6 +8,12 @@
         app:showAsAction="always"
         android:orderInCategory="50"/>
     <item
+        android:id="@+id/ic_action_share"
+        android:icon="@drawable/ic_action_share"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="70"
+        android:title="Share"/>
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"

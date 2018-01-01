@@ -2,7 +2,10 @@ package com.example.orankarl.ddls;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -38,6 +41,7 @@ import org.litepal.crud.DataSupport;
 import java.lang.reflect.Array;
 import java.math.MathContext;
 import java.net.PasswordAuthentication;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,6 +49,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static android.view.View.GONE;
+import static android.view.View.LAYER_TYPE_SOFTWARE;
 import static android.view.View.SCROLLBAR_POSITION_DEFAULT;
 import static android.view.View.resolveSize;
 
@@ -184,6 +189,59 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
+    public Bitmap getScreenshot() {
+        int size = recyclerView.getAdapter().getItemCount();
+        int iHeight = 0;
+        DeadlineAdapter.ViewHolder viewHolder = (DeadlineAdapter.ViewHolder) recyclerView.getAdapter().createViewHolder(recyclerView, 0);
+        for (int i = 0; i < size; i++) {
+            recyclerView.getAdapter().onBindViewHolder(viewHolder, i);
+            viewHolder.itemView.measure(View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            iHeight += viewHolder.itemView.getMeasuredHeight();
+            viewHolder.itemView.layout(0, 0, viewHolder.itemView.getMeasuredWidth(), viewHolder.itemView.getMeasuredHeight());
+        }
+        Bitmap bigBitmap = Bitmap.createBitmap(recyclerView.getMeasuredWidth(), iHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bigBitmap);
+        canvas.drawColor(Color.WHITE);
+
+        Paint paint = new Paint();
+        iHeight = 0;
+        for (int i = 0; i < size; i++) {
+            recyclerView.getAdapter().onBindViewHolder(viewHolder, i);
+            int height = iHeight;
+            viewHolder.itemView.measure(
+                    View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            );
+            viewHolder.itemView.setLayerType(LAYER_TYPE_SOFTWARE, null);
+            viewHolder.itemView.setDrawingCacheEnabled(true);
+            viewHolder.itemView.buildDrawingCache();
+            canvas.drawBitmap(viewHolder.itemView.getDrawingCache(), 0f, iHeight, paint);
+
+            viewHolder.textView3.setDrawingCacheEnabled(true);
+            viewHolder.textView3.buildDrawingCache();
+            canvas.drawBitmap(viewHolder.textView3.getDrawingCache(), 3f, iHeight, paint);
+            viewHolder.textView3.setDrawingCacheEnabled(false);
+            viewHolder.textView3.destroyDrawingCache();
+            viewHolder.textView4.setDrawingCacheEnabled(true);
+            viewHolder.textView4.buildDrawingCache();
+            canvas.drawBitmap(viewHolder.textView4.getDrawingCache(), 3f, iHeight+viewHolder.textView3.getMeasuredHeight(), paint);
+            viewHolder.textView4.setDrawingCacheEnabled(false);
+            viewHolder.textView4.destroyDrawingCache();
+
+            View cardView = viewHolder.cardView;
+//            viewHolder.cardView.setDrawingCacheEnabled(true);
+//            viewHolder.cardView.buildDrawingCache();
+//            canvas.drawBitmap(viewHolder.cardView.getDrawingCache(), viewHolder.textView1.getMeasuredWidth()+viewHolder.itemLine.getMeasuredWidth(), iHeight, paint);
+//            viewHolder.cardView.setDrawingCacheEnabled(false);
+//            viewHolder.cardView.destroyDrawingCache();
+
+            iHeight += viewHolder.itemView.getMeasuredHeight();
+            viewHolder.itemView.setDrawingCacheEnabled(false);
+            viewHolder.itemView.destroyDrawingCache();
+        }
+        return bigBitmap;
+    }
 
 
 }

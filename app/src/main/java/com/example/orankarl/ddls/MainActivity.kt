@@ -1,9 +1,15 @@
 package com.example.orankarl.ddls
 
+import android.Manifest
 import android.app.ProgressDialog.show
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.preference.PreferenceManager
 import android.service.autofill.FillEventHistory
 import android.support.design.widget.Snackbar
@@ -35,6 +41,9 @@ import kotlinx.android.synthetic.main.deadline_item.*
 import kotlinx.android.synthetic.main.deadline_item.view.*
 import org.litepal.LitePal
 import org.litepal.crud.DataSupport
+import java.awt.font.NumericShaper
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 
@@ -203,8 +212,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuActionAdd()
                 return true
             }
+            R.id.ic_action_share -> {
+                shareScreenshot()
+            }
             else -> return super.onOptionsItemSelected(item)
         }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun menuActionAdd() {
@@ -247,6 +260,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 })
                 .show()
     }
+
+    private fun shareScreenshot() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            val REQUEST_CODE_CONTACT = 101
+            val permissions = Array<String>(1) {Manifest.permission.WRITE_EXTERNAL_STORAGE}
+            //验证是否许可权限
+            for (str in permissions) {
+                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+                    //申请权限
+                    this.requestPermissions(permissions, REQUEST_CODE_CONTACT)
+                    return
+                }
+            }
+        }
+        val fragmentManager = supportFragmentManager
+        for (fragment in fragmentManager.fragments) {
+            if (fragment != null && fragment is DeadlineFragment) {
+                val bitmap = fragment.screenshot
+                val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val calendar = Calendar.getInstance()
+                val fileName = calendar.get(Calendar.YEAR).toString() + '_'+
+                        (calendar.get(Calendar.MONTH) + 1).toString() + '_'+
+                        calendar.get(Calendar.DAY_OF_MONTH).toString() + '_'+
+                        calendar.get(Calendar.HOUR_OF_DAY).toString() +
+                                calendar.get(Calendar.MINUTE).toString() +
+                                calendar.get(Calendar.SECOND).toString() + ".jpeg"
+                val imageFile = File(path, fileName)
+                val fileOutPutStream = FileOutputStream(imageFile)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, fileOutPutStream)
+                fileOutPutStream.flush()
+                fileOutPutStream.close()
+                val intent = Intent(Intent.ACTION_SEND)
+                intent.type = "image/jpeg"
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + imageFile.absolutePath))
+                intent.putExtra(Intent.EXTRA_TEXT, "Share your deadlines")
+                startActivity(Intent.createChooser(intent, "share"))
+            }
+        }
+    }
+
+
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.

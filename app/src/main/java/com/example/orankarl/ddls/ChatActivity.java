@@ -171,4 +171,10 @@ public class ChatActivity extends AppCompatActivity {
             return 0;
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }
