@@ -39,4 +39,5 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.android.support:animated-vector-drawable:26.1.0'
     implementation files('F:/Android/DDLs/libs/lite-orm-1.9.2.jar')
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
 }

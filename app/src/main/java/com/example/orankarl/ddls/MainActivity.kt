@@ -39,6 +39,7 @@ import com.example.orankarl.ddls.R.id.*
 import kotlinx.android.synthetic.main.add_deadline_dialog.view.*
 import kotlinx.android.synthetic.main.deadline_item.*
 import kotlinx.android.synthetic.main.deadline_item.view.*
+import kotlinx.android.synthetic.main.nav_header_main.*
 import org.litepal.LitePal
 import org.litepal.crud.DataSupport
 import java.awt.font.NumericShaper
@@ -57,6 +58,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var pref:SharedPreferences
     private lateinit var editor:SharedPreferences.Editor
     private lateinit var lastUsername:String
+    private var isLogin:Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +85,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         adapter.addFragment(NoticeFragment(), "Notice")
         adapter.addFragment(ChatListFragment(), "Group")
         viewPager.adapter = adapter
+    }
+
+    private fun initDrawer() {
+        drawer_name.setText(R.string.not_login_name)
+        drawer_image.setOnClickListener(View.OnClickListener {
+            if (!isLogin) {
+                Intent intent
+            }
+        })
+    }
+
+    private fun setLocalUser() {
+
     }
 
     private fun initDatabase() {

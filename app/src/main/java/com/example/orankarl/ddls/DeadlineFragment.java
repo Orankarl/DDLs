@@ -174,6 +174,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
+
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter((new DeadlineAdapter(getActivity(), deadlineList, this)));
