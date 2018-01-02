@@ -100,48 +100,48 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             currentUser = manager.queryByWhere(User::class.java, "username", Array(1){lastUsername})[0]
         }
 
-        manager.deleteAll(Deadline::class.java)
-        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
-                "组合数学作业",
-                "第十三次",
-                currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
-                "图形学大作业",
-                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
-                currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
-                "数据库大作业",
-                "",
-                currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
-                "人工智能大作业",
-                "Building neural network by C++ (Without using any existing package).",
-                currentUser.username))
+//        manager.deleteAll(Deadline::class.java)
+//        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
+//                "组合数学作业",
+//                "第十三次",
+//                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
+//                "图形学大作业",
+//                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
+//                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
+//                "数据库大作业",
+//                "",
+//                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
+//                "人工智能大作业",
+//                "Building neural network by C++ (Without using any existing package).",
+//                currentUser.username))
 //        manager.insert(Deadline(getNewCalendar(2018, 1, 2).timeInMillis,
 //                "3",
 //                "Building neural network by C++ (Without using any existing package).",
 //                currentUser.username))
 
-        manager.deleteAll(Notice::class.java)
-        manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
+//        manager.deleteAll(Notice::class.java)
+//        manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
+//        manager.insert(Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
+//        manager.insert(Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
+//        manager.insert(Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser.username))
+//        manager.insert(Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
 
-        manager.deleteAll(Course::class.java)
-        manager.insert(Course(1, "人工智能", currentUser.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
-        manager.insert(Course(2, "数据库系统原理", currentUser.username, Calendar.getInstance().timeInMillis, "B", "新年快乐", "大三第一学期"))
-        manager.insert(Course(3, "高性能计算", currentUser.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候", "大三第一学期"))
-        manager.insert(Course(4, "计算机图形学", currentUser.username, Calendar.getInstance().timeInMillis, "D", "还行", "大三第一学期"))
+//        manager.deleteAll(Course::class.java)
+//        manager.insert(Course(1, "人工智能", currentUser.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
+//        manager.insert(Course(2, "数据库系统原理", currentUser.username, Calendar.getInstance().timeInMillis, "B", "新年快乐", "大三第一学期"))
+//        manager.insert(Course(3, "高性能计算", currentUser.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候", "大三第一学期"))
+//        manager.insert(Course(4, "计算机图形学", currentUser.username, Calendar.getInstance().timeInMillis, "D", "还行", "大三第一学期"))
 
-        manager.deleteAll(Msg::class.java)
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "C", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "B", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "A", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 2, currentUser.username, "B", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 3, currentUser.username, "C", "期末考什么时候", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 4, currentUser.username, "D", "还行", Msg.LEFT));
+//        manager.deleteAll(Msg::class.java)
+//        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "C", "你好", Msg.LEFT));
+//        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "B", "你好", Msg.LEFT));
+//        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "A", "你好", Msg.LEFT));
+//        manager.insert(Msg(Calendar.getInstance().timeInMillis, 2, currentUser.username, "B", "你好", Msg.LEFT));
+//        manager.insert(Msg(Calendar.getInstance().timeInMillis, 3, currentUser.username, "C", "期末考什么时候", Msg.LEFT));
+//        manager.insert(Msg(Calendar.getInstance().timeInMillis, 4, currentUser.username, "D", "还行", Msg.LEFT));
 
 //        manager.deleteAll(Course::class.java)
 //        manager.insert(Course(1, "人工智能", "大三第一学期", currentUser.username))
@@ -289,6 +289,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val fragmentManager = supportFragmentManager
         for (fragment in fragmentManager.fragments) {
             if (fragment != null && fragment is DeadlineFragment) {
+                if (fragment.adapter.values.isEmpty()) return
                 val bitmap = fragment.screenshot
                 val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                 val calendar = Calendar.getInstance()
@@ -323,11 +324,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(intent)
                 // Handle the camera action
             }
-            R.id.nav_gallery -> {
-                intent = Intent(this, CourseActivity::class.java)
-                intent.putExtra("CurrentUserName", currentUser.username);
-                startActivity(intent)
-            }
+//            R.id.nav_gallery -> {
+//                intent = Intent(this, CourseActivity::class.java)
+//                intent.putExtra("CurrentUserName", currentUser.username);
+//                startActivity(intent)
+//            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

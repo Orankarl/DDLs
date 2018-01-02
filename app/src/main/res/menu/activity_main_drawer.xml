@@ -8,10 +8,6 @@
             android:id="@+id/nav_finished"
             android:icon="@drawable/ic_menu_finished"
             android:title="Finished Deadlines" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_action_course"
-            android:title="Courses" />
     </group>
 
 </menu>
