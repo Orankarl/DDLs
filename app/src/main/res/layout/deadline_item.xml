@@ -32,10 +32,11 @@
     </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/timeline_frame"
         android:layout_width="18dp"
         android:layout_height="match_parent">
         <FrameLayout
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal"
             android:layout_width="8dp"
             android:layout_height="match_parent"
             android:padding="4dp"

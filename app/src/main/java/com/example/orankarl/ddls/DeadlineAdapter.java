@@ -3,6 +3,7 @@ package com.example.orankarl.ddls;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.icu.text.LocaleDisplayNames;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
@@ -57,7 +58,7 @@ public class DeadlineAdapter
         public final TextView textView2;
         public final TextView textView3;
         public final TextView textView4;
-        public final FrameLayout itemLine;
+        public final FrameLayout itemLine, frameLayout;
         public final CardView cardView;
         public final LinearLayout rightStrip;
         public final int[] androidColors;
@@ -77,6 +78,7 @@ public class DeadlineAdapter
             androidColors  = view.getResources().getIntArray(R.array.android_colors1);
             marker = view.findViewById(R.id.deadline_marker);
             metrics = view.getResources().getDisplayMetrics();
+            frameLayout = view.findViewById(R.id.timeline_frame);
         }
     }
 
@@ -122,10 +124,12 @@ public class DeadlineAdapter
             }
             Calendar present_calendar = Calendar.getInstance();
             if (CalendarComparator.INSTANCE.compare(present_calendar, pre_calendar) == 1
-                    && CalendarComparator.INSTANCE.compare(pre_calendar, calendar) != 1) {
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) holder.itemLine.getLayoutParams();
+                    && CalendarComparator.INSTANCE.compare(present_calendar, calendar) != 1) {
+                Log.d("compare", deadline.getTitle());
+//                holder.itemLine.setPadding(0, 240, 0, 0);
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.frameLayout.getLayoutParams();
                 params.setMargins(0, 24, 0, 0);
-                holder.itemLine.setLayoutParams(params);
+                holder.frameLayout.setLayoutParams(params);
             }
         }
         if (position < getItemCount()-1) {

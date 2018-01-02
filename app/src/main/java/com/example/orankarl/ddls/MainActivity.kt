@@ -117,6 +117,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 "人工智能大作业",
                 "Building neural network by C++ (Without using any existing package).",
                 currentUser.username))
+        manager.insert(Deadline(getNewCalendar(2018, 1, 2).timeInMillis,
+                "3",
+                "Building neural network by C++ (Without using any existing package).",
+                currentUser.username))
 
         manager.deleteAll(Notice::class.java)
         manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
@@ -312,13 +316,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
+                intent = Intent(this, CourseActivity::class.java)
+                intent.putExtra("CurrentUserName", currentUser.username);
+                startActivity(intent)
             }
         }
 
