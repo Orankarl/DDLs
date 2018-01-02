@@ -18,14 +18,23 @@ public class Course {
     private long time;
     private String latestName;
     private String latestMsg;
+    private String semester;
 
-    Course(long id, String title, String username, long time, String latestName, String latestMsg) {
+    Course(long id, String title, String username, long time, String latestName, String latestMsg, String semester) {
         this.course_id = id;
         this.time = time;
         this.title = title;
         this.username = username;
         this.latestMsg = latestMsg;
         this.latestName = latestName;
+        this.semester = semester;
+    }
+
+    Course(long id, String title, String semester, String username) {
+        course_id = id;
+        this.title = title;
+        this.semester = semester;
+        this.username = username;
     }
 
     public long getId() {
@@ -86,5 +95,13 @@ public class Course {
 
     public void setLatestMsg(String latestMsg) {
         this.latestMsg = latestMsg;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 }

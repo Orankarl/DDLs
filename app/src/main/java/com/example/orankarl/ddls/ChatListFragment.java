@@ -141,7 +141,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
             holder.mBoundString = item.getTitle();
             holder.textView1.setText(item.getTitle());
             String name = item.getLatestName();
-            if (name.length() > NAME_MAX_LEN) name = name.substring(0, NAME_MAX_LEN-2) + "..";
+            if (name != null && name.length() > NAME_MAX_LEN) name = name.substring(0, NAME_MAX_LEN-2) + "..";
             String message = item.getLatestMsg();
             holder.textView2.setText(name + ": " + message);
 
@@ -170,5 +170,20 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 return mValues.size();
             return 0;
         }
+
+
+
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+            onRefresh();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        onRefresh();
     }
 }

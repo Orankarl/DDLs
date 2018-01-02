@@ -31,7 +31,8 @@
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".CourseActivity"></activity>
+        <activity android:name=".CourseActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

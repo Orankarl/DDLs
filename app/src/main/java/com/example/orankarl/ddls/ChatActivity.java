@@ -50,7 +50,7 @@ public class ChatActivity extends AppCompatActivity {
         loadMsgList();
         setRecyclerView(recyclerView);
 
-        List<Course> course = manager.queryCourseById(course_id);
+        final List<Course> course = manager.queryCourseById(course_id);
 
         toolbar = findViewById(R.id.chat_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_action_back_arrow);
@@ -68,6 +68,11 @@ public class ChatActivity extends AppCompatActivity {
                 Msg newMsg = new Msg(Calendar.getInstance().getTimeInMillis(), course_id, currentUsername, currentUsername, editText.getText().toString(), Msg.RIGHT);
                 if (manager != null && adapter != null && adapter.mValues != null) {
                     manager.insert(newMsg);
+                    List<Course> list = manager.queryCourseById(course_id);
+                    Course course1 = list.get(0);
+                    course1.setLatestMsg(newMsg.getContent());
+                    course1.setLatestName(newMsg.getSender());
+                    manager.update(course1);
                     adapter.mValues.add(newMsg);
                     adapter.notifyItemInserted(adapter.getItemCount()-1);
                     recyclerView.scrollToPosition(adapter.getItemCount()-1);
