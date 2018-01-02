@@ -109,11 +109,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 "图形学大作业",
                 "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
                 currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
                 "数据库大作业",
                 "",
                 currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
+        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
                 "人工智能大作业",
                 "Building neural network by C++ (Without using any existing package).",
                 currentUser.username))
