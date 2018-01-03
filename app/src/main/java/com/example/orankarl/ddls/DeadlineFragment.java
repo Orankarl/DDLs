@@ -182,6 +182,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void loadDeadlineList() {
+//        Net.queryDeadlineList();
         User currentUser = currentUserListener.getCurrentUserDeadline();
         if (manager != null) {
             deadlineList = manager.queryDeadline(currentUser.getUsername(), false);

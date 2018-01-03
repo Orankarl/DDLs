@@ -25,20 +25,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_main_bar.*
 import android.support.v4.view.ViewPager
 import android.view.View
-import android.widget.Adapter
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.content.ContextCompat.startActivity
 import android.util.Log
-import android.widget.DatePicker
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.example.orankarl.ddls.R.id.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.add_deadline_dialog.view.*
 import kotlinx.android.synthetic.main.deadline_item.*
 import kotlinx.android.synthetic.main.deadline_item.view.*
+import kotlinx.android.synthetic.main.finished_deadline_dialog.view.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import org.litepal.LitePal
 import org.litepal.crud.DataSupport
@@ -59,6 +58,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var editor:SharedPreferences.Editor
     private lateinit var lastUsername:String
     private var isLogin:Boolean = false
+    private lateinit var headerView:View
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +76,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupViewPager(viewpager)
         tabs.setupWithViewPager(viewpager)
 
+        initDrawer()
+
         initDatabase()
     }
 
@@ -88,10 +90,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun initDrawer() {
-        drawer_name.setText(R.string.not_login_name)
-        drawer_image.setOnClickListener(View.OnClickListener {
+        headerView = nav_view.getHeaderView(0)
+        val drawerName = headerView.findViewById<TextView>(R.id.drawer_name)
+        drawerName.setText(R.string.not_login_name)
+        val drawerImage = headerView.findViewById<ImageView>(R.id.drawer_image)
+        drawerImage.setOnClickListener(View.OnClickListener {
             if (!isLogin) {
-                Intent intent
+                drawer_layout.closeDrawer(GravityCompat.START)
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
             }
         })
     }
@@ -333,19 +340,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_finished -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
                 intent = Intent(this, FinishedDeadlineActivity::class.java)
                 intent.putExtra("CurrentUserName", currentUser.username);
                 startActivity(intent)
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
+                drawer_layout.closeDrawers()
                 intent = Intent(this, CourseActivity::class.java)
-                intent.putExtra("CurrentUserName", currentUser.username);
+                intent.putExtra("CurrentUserName", currentUser.username)
                 startActivity(intent)
             }
         }
 
-        drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
@@ -366,6 +374,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
                 fragment.onRefresh()
             }
+        }
+        if (Net.isLogin) {
+            headerView = nav_view.getHeaderView(0)
+            val drawerName = headerView.findViewById<TextView>(R.id.drawer_name)
+            drawerName.setText(Net.username)
         }
     }
 
