@@ -1,5 +1,6 @@
 package com.example.orankarl.ddls;
 
+import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -42,6 +43,7 @@ import com.bumptech.glide.load.resource.NullDecoder;
 
 import org.litepal.crud.DataSupport;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.math.MathContext;
 import java.net.PasswordAuthentication;
@@ -64,7 +66,7 @@ import static android.view.View.resolveSize;
  */
 
 public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, DeadlineAdapter.onRefreshListener {
-
+    public static final int QUERY_FINISHED = 0, QUERY_ERROR = 1, ADD_SUCCESS = 2, ADD_ERROR = 3;
 
 //    private Activity activity;
 
@@ -74,7 +76,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     public DeadlineAdapter adapter;
     public List<Deadline> deadlineList;
     private DatabaseManager manager;
-//    private MainActivity.Companion.MyHandler handler;
+    private MyHandler handler = new MyHandler(this);
 
 //    DeadlineCurrentUserGetter currentUserListener;
 //
@@ -99,28 +101,6 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 //        activity = (Activity) context;
     }
 
-    private Handler ahandler = new Handler() {
-//        public void handleMessage(Message msg) {
-//            switch (msg.what) {
-//                case QUERY_FINISHED:
-//                    break;
-//                case QUERY_ERROR:
-//                    final String reason = (String) msg.obj;
-//                    activity.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(activity, reason, Toast.LENGTH_SHORT);
-//                        }
-//                    });
-//
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-    };
-
-//    @Override
     public void reloadDeadline() {
         if (Net.isLogin) {
             new Thread(new Runnable() {
@@ -129,16 +109,16 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     String ret = Net.queryDeadlineList();
                     if (ret.equals("")) {
                         Message message = new Message();
-                        message.what = MainActivity.Companion.getQUERY_ERROR();
-//                        handler.sendMessage(message);
+                        message.what = DeadlineFragment.QUERY_FINISHED;
+                        handler.sendMessage(message);
                     } else{
                         Message message = new Message();
-                        message.what = MainActivity.Companion.getQUERY_FINISHED();
+                        message.what = DeadlineFragment.QUERY_ERROR;
                         message.obj = ret;
-//                        handler.sendMessage(message);
+                        handler.sendMessage(message);
                     }
                 }
-            });
+            }).start();
         }
     }
 
@@ -205,9 +185,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 onRefresh();
             }
         });
-        Log.d("123", "123");
         manager = DatabaseManager.getInstance(this.getContext());
-//        onRefresh();
         setupRecyclerView(recyclerView);
         return view;
     }
@@ -245,8 +223,36 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
-    public void errorUpdatingDeadlineAdapter() {
-        loadDeadlineList();
+    public void addNewDeadline(final Deadline deadline) {
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.addDeadline(deadline);
+                    if (Character.isDigit(ret.indexOf(0))) {
+                        long id = Long.parseLong(ret);
+                        Message msg = new Message();
+                        msg.what = ADD_SUCCESS;
+                        msg.arg1 = (int) id;
+                        msg.obj = deadline;
+                        handler.sendMessage(msg);
+                    } else {
+                        Message msg = new Message();
+                        msg.what = ADD_ERROR;
+                        msg.obj = ret;
+                        handler.sendMessage(msg);
+                    }
+                }
+            }).start();
+        }
+    }
+
+    public int insertDeadlineDB(Deadline deadline) {
+        if (manager != null) {
+            manager.insert(deadline);
+            return 0;
+        }
+        return 1;
     }
 
 
@@ -260,6 +266,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         if (manager != null) {
             if (Net.isLogin) {
                 deadlineList = manager.queryDeadline(Net.username, false);
+                Log.d("listSize", String.valueOf(deadlineList.size()));
             } else {
                 deadlineList = manager.queryDeadline("local", false);
             }
@@ -321,6 +328,34 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             viewHolder.itemView.destroyDrawingCache();
         }
         return bigBitmap;
+    }
+
+    private static class MyHandler extends Handler {
+        private final WeakReference<DeadlineFragment> fragmentWeakReference;
+        MyHandler(DeadlineFragment fragment) {
+            fragmentWeakReference = new WeakReference<DeadlineFragment>(fragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case DeadlineFragment.QUERY_FINISHED:
+                    fragmentWeakReference.get().updateDeadlineAdapter();
+                    break;
+                case DeadlineFragment.QUERY_ERROR:
+                    String ret = (String)msg.obj;
+                    Toast.makeText(fragmentWeakReference.get().getContext(), ret, Toast.LENGTH_SHORT).show();
+                    fragmentWeakReference.get().updateDeadlineAdapter();
+                    break;
+                case  DeadlineFragment.ADD_SUCCESS:
+                    Deadline deadline = (Deadline) msg.obj;
+                    int id = msg.arg1;
+                    deadline
+                default:
+                    break;
+            }
+        }
     }
 
 }

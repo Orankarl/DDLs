@@ -62,31 +62,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var headerView:View
 
 
-
-    companion object {
-        public val QUERY_FINISHED = 1
-        public val QUERY_ERROR = 2
-//        class MyHandler(activity: MainActivity?):Handler() {
-//            private final var mActivity = WeakReference<MainActivity>(activity)
-//
-//            public override fun handleMessage(msg: Message?) {
-//                val activity:MainActivity? = mActivity.get()
-//                if (activity != null) {
-//                    when(msg?.what) {
-//                        MainActivity.QUERY_FINISHED -> {
-//                            activity.refreshDeadlineFragment()
-//                        }
-//                        MainActivity.QUERY_ERROR -> {
-//                            Toast.makeText(activity, (msg.obj as String), Toast.LENGTH_SHORT)
-//                            activity.refreshDeadlineFragment()
-//                        }
-//                    }
-//                }
-//            }
-//        }
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -321,18 +296,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val fragmentManager = supportFragmentManager
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
-//                            val calendar1 = Calendar.getInstance()
-//                            val deadline = Deadline(calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username)
-//                            if (title.text.isEmpty()) {
-//                                Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
-//                            }
-//                            else if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1)
-//                                Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
-//                            else {
-//                                manager.insert(deadline)
-//                                fragment.onRefresh()
-//                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
-//                            }
+                            val calendar1 = Calendar.getInstance()
+                            val deadline = Deadline(-1, calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username)
+                            if (title.text.isEmpty()) {
+                                Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
+                            }
+                            else if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1)
+                                Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
+                            else {
+                                manager.insert(deadline)
+                                fragment.onRefresh()
+                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
+                            }
 
                         }
                     }
@@ -402,15 +377,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        val fragmentManager = supportFragmentManager
-        for (fragment in fragmentManager.fragments) {
-            if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
-                fragment.onRefresh()
-            }
-        }
-    }
+//    override fun onRestart() {
+//        super.onRestart()
+//        val fragmentManager = supportFragmentManager
+//        for (fragment in fragmentManager.fragments) {
+//            if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
+//                fragment.onRefresh()
+//            }
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()

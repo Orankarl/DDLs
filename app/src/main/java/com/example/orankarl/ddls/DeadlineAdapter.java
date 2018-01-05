@@ -116,6 +116,12 @@ public class DeadlineAdapter
             if (pre_calendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)
                     && pre_calendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)
                     && pre_calendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)) {
+//                Log.d("pre_calendar", String.valueOf(pre_calendar.get(Calendar.YEAR))
+//                + String.valueOf(pre_calendar.get(Calendar.MONTH)+1)
+//                + String.valueOf(pre_calendar.get(Calendar.DAY_OF_MONTH)));
+//                Log.d("calendar", String.valueOf(calendar.get(Calendar.YEAR))
+//                        + String.valueOf(calendar.get(Calendar.MONTH)+1)
+//                        + String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
                 holder.textView3.setVisibility(GONE);
                 holder.textView4.setVisibility(GONE);
                 int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, holder.metrics);

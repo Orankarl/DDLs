@@ -33,12 +33,13 @@ public class Deadline {
     @Default("false")
     private boolean finished;
 
-    public Deadline(long id, long calendarMillis, String title, String info, String userName) {
+    public Deadline(long id, long calendarMillis, String title, String info, String userName, boolean done) {
         this.id = id;
         this.calendarMillis = calendarMillis;
         this.title = title;
         this.info = info;
         this.userName = userName;
+        finished = done;
     }
 
     public Deadline(Deadline deadline) {

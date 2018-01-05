@@ -120,15 +120,15 @@ public class Net {
             String reason = jsonObject.getString("reason");
             if (status.equals("-1")) return reason;
             else {
+                Log.d("parsing deadlines", "yes");
                 JSONArray array = jsonObject.getJSONArray("deadlines");
                 int len = array.length();
                 List<Deadline> deadlineList = new ArrayList<>();
                 for (int i = 0; i < len; i++) {
                     JSONObject json = array.getJSONObject(i);
-                    Log.d("deadlines", json.getString("time"));
                     deadlineList.add(new Deadline(json.getLong("id"),
                             json.getLong("time"), json.getString("title"),
-                            json.getString("description"), Net.username));
+                            json.getString("description"), Net.username, json.getBoolean("done")));
                 }
                 int code = DatabaseManager.insertDeadlines(deadlineList);
                 if (code == 0) return "";
@@ -140,7 +140,35 @@ public class Net {
     }
 
     public static String addDeadline(Deadline deadline) {
-        return "";
+        try {
+            if (client == null) client = new OkHttpClient();
+            OkHttpClient client = new OkHttpClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("token", token)
+                    .add("title", deadline.getTitle())
+                    .add("description", deadline.getInfo())
+                    .add("time", String.valueOf(deadline.getCalendarMillis()))
+                    .build();
+            Request request = new Request.Builder()
+                    .url(url+"/api/deadline")
+                    .post(requestBody)
+                    .build();
+            Response response = client.newCall(request).execute();
+            JSONObject jsonObject = new JSONObject(response.body().string());
+            //parseObject
+            String status = jsonObject.getString("status");
+            String reason = jsonObject.getString("reason");
+            if (status.equals("1")) {
+                long id = jsonObject.getLong("id");
+                return "";
+            } else {
+                return reason;
+            }
+//            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "No response";
     }
 
     public static String attachHttpGetParams(String url, LinkedHashMap<String,String> params){
