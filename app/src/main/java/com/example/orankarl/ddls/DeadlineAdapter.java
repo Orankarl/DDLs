@@ -46,7 +46,7 @@ public class DeadlineAdapter
     public onRefreshListener refreshListener;
 
     public interface onRefreshListener {
-        void reloadDeadline();
+//        void reloadDeadline();
         void undoDeleteDeadline(Deadline deadline, int position);
         void undoFinishDeadline(Long finishedDeadlineId, int position);
     }

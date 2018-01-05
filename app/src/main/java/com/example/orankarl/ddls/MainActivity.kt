@@ -6,10 +6,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
+import android.os.*
 import android.preference.PreferenceManager
 import android.service.autofill.FillEventHistory
 import android.support.design.widget.Snackbar
@@ -32,6 +31,7 @@ import android.util.Log
 import android.widget.*
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
+import com.example.orankarl.ddls.Net.isLogin
 import com.example.orankarl.ddls.R.id.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.add_deadline_dialog.view.*
@@ -44,11 +44,12 @@ import org.litepal.crud.DataSupport
 import java.awt.font.NumericShaper
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.ref.WeakReference
 import java.util.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
-        DeadlineFragment.DeadlineCurrentUserGetter, NoticeFragment.NoticeCurrentUserGetter, ChatListFragment.ChatCurrentUserListener {
+        NoticeFragment.NoticeCurrentUserGetter, ChatListFragment.ChatCurrentUserListener {
 
 //    private lateinit var dialog:AddDeadlineDialog
     private lateinit var adapter:MainActivity.Adapter
@@ -59,6 +60,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var lastUsername:String
     private var isLogin:Boolean = false
     private lateinit var headerView:View
+
+
+
+    companion object {
+        public val QUERY_FINISHED = 1
+        public val QUERY_ERROR = 2
+//        class MyHandler(activity: MainActivity?):Handler() {
+//            private final var mActivity = WeakReference<MainActivity>(activity)
+//
+//            public override fun handleMessage(msg: Message?) {
+//                val activity:MainActivity? = mActivity.get()
+//                if (activity != null) {
+//                    when(msg?.what) {
+//                        MainActivity.QUERY_FINISHED -> {
+//                            activity.refreshDeadlineFragment()
+//                        }
+//                        MainActivity.QUERY_ERROR -> {
+//                            Toast.makeText(activity, (msg.obj as String), Toast.LENGTH_SHORT)
+//                            activity.refreshDeadlineFragment()
+//                        }
+//                    }
+//                }
+//            }
+//        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +101,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setupViewPager(viewpager)
         tabs.setupWithViewPager(viewpager)
+        tabs.setTabTextColors(Color.parseColor("#67FFFF"), Color.parseColor("#FFFFFF"))
 
         initDrawer()
 
@@ -84,8 +111,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupViewPager(viewPager: ViewPager) {
         adapter = Adapter(supportFragmentManager)
         adapter.addFragment(DeadlineFragment(), "DDL")
-        adapter.addFragment(NoticeFragment(), "Notice")
-        adapter.addFragment(ChatListFragment(), "Group")
+        adapter.addFragment(NoticeFragment(), "NOTICE")
+        adapter.addFragment(ChatListFragment(), "GROUP")
         viewPager.adapter = adapter
     }
 
@@ -107,6 +134,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    private fun refreshDeadlineFragment() {
+        val fragmentManager = supportFragmentManager
+        for (fragment in fragmentManager.fragments) {
+            if (fragment != null && fragment is DeadlineFragment) {
+                fragment.updateDeadlineAdapter()
+            }
+        }
+    }
+
+    private fun errorRefreshingDeadlineFragment() {
+        val fragmentManager = supportFragmentManager
+        for (fragment in fragmentManager.fragments) {
+            if (fragment != null && fragment is DeadlineFragment) {
+                fragment.errorUpdatingDeadlineAdapter()
+            }
+        }
+    }
+
     private fun initDatabase() {
         pref = PreferenceManager.getDefaultSharedPreferences(this)
         lastUsername = pref.getString("username", "local")
@@ -123,22 +168,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         manager.deleteAll(Deadline::class.java)
-        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
-                "组合数学作业",
-                "第十三次",
-                currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
-                "图形学大作业",
-                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
-                currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
-                "数据库大作业",
-                "",
-                currentUser.username))
-        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
-                "人工智能大作业",
-                "Building neural network by C++ (Without using any existing package).",
-                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
+//                "组合数学作业",
+//                "第十三次",
+//                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
+//                "图形学大作业",
+//                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
+//                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
+//                "数据库大作业",
+//                "",
+//                currentUser.username))
+//        manager.insert(Deadline(getNewCalendar(2018, 1, 3).timeInMillis,
+//                "人工智能大作业",
+//                "Building neural network by C++ (Without using any existing package).",
+//                currentUser.username))
 //        manager.insert(Deadline(getNewCalendar(2018, 1, 2).timeInMillis,
 //                "3",
 //                "Building neural network by C++ (Without using any existing package).",
@@ -210,9 +255,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser).save()
     }
 
-    override fun getCurrentUserDeadline():User {
-        return currentUser
-    }
+//    override fun getCurrentUserDeadline():User {
+//        return currentUser
+//    }
 
     override fun getCurrentUserNotice(): User {
         return currentUser
@@ -276,18 +321,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val fragmentManager = supportFragmentManager
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
-                            val calendar1 = Calendar.getInstance()
-                            val deadline = Deadline(calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username)
-                            if (title.text.isEmpty()) {
-                                Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
-                            }
-                            else if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1)
-                                Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
-                            else {
-                                manager.insert(deadline)
-                                fragment.onRefresh()
-                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
-                            }
+//                            val calendar1 = Calendar.getInstance()
+//                            val deadline = Deadline(calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username)
+//                            if (title.text.isEmpty()) {
+//                                Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
+//                            }
+//                            else if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1)
+//                                Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
+//                            else {
+//                                manager.insert(deadline)
+//                                fragment.onRefresh()
+//                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
+//                            }
 
                         }
                     }

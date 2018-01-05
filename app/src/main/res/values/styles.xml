@@ -52,4 +52,10 @@
 
     </style>
 
+    <style name="TabLayoutTextStyle">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+
+    </style>
+
 </resources>

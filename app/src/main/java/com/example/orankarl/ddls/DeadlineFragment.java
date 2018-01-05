@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.TokenWatcher;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -48,6 +52,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.internal.http.RetryAndFollowUpInterceptor;
+
 import static android.view.View.GONE;
 import static android.view.View.LAYER_TYPE_SOFTWARE;
 import static android.view.View.SCROLLBAR_POSITION_DEFAULT;
@@ -59,32 +65,81 @@ import static android.view.View.resolveSize;
 
 public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, DeadlineAdapter.onRefreshListener {
 
+
+//    private Activity activity;
+
     private SwipeRefreshLayout swipeRefreshLayout;
     private View view;
     private RecyclerView recyclerView;
     public DeadlineAdapter adapter;
     public List<Deadline> deadlineList;
     private DatabaseManager manager;
+//    private MainActivity.Companion.MyHandler handler;
 
-    DeadlineCurrentUserGetter currentUserListener;
+//    DeadlineCurrentUserGetter currentUserListener;
+//
+//    public interface DeadlineCurrentUserGetter{
+//        User getCurrentUserDeadline();
+//    }
+//
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        try {
+//            currentUserListener = (DeadlineCurrentUserGetter) context;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(context.toString() + "must implement getCurrentUserDeadline");
+//        }
+//    }
 
-    public interface DeadlineCurrentUserGetter{
-        User getCurrentUserDeadline();
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        try {
-            currentUserListener = (DeadlineCurrentUserGetter) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement getCurrentUserDeadline");
-        }
+//        activity = (Activity) context;
     }
 
-    @Override
+    private Handler ahandler = new Handler() {
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case QUERY_FINISHED:
+//                    break;
+//                case QUERY_ERROR:
+//                    final String reason = (String) msg.obj;
+//                    activity.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(activity, reason, Toast.LENGTH_SHORT);
+//                        }
+//                    });
+//
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+    };
+
+//    @Override
     public void reloadDeadline() {
-        onRefresh();
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.queryDeadlineList();
+                    if (ret.equals("")) {
+                        Message message = new Message();
+                        message.what = MainActivity.Companion.getQUERY_ERROR();
+//                        handler.sendMessage(message);
+                    } else{
+                        Message message = new Message();
+                        message.what = MainActivity.Companion.getQUERY_FINISHED();
+                        message.obj = ret;
+//                        handler.sendMessage(message);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -138,6 +193,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_deadline, container, false);
         recyclerView = view.findViewById(R.id.deadline_recyclerview);
+//        handler = new MainActivity.Companion.MyHandler((MainActivity) getActivity());
         swipeRefreshLayout = view.findViewById(R.id.deadline_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -149,17 +205,32 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 onRefresh();
             }
         });
-        loadDeadlineList();
-        setupRecyclerView(recyclerView);
-
+        Log.d("123", "123");
         manager = DatabaseManager.getInstance(this.getContext());
+//        onRefresh();
+        setupRecyclerView(recyclerView);
         return view;
     }
 
     @Override
     public void onRefresh() {
-        loadDeadlineList();
+        Log.d("refresh", "yes");
+        if (Net.isLogin) {
+            Log.d("isLogin", "Yes");
+            reloadDeadline();
+        } else {
+            Log.d("isLogin", "No");
+            updateDeadlineAdapter();
+        }
+//        loadDeadlineList();
 //        deadlineList.loadDeadlineList(currentUserListener.getCurrentUserDeadline());
+//        adapter = new DeadlineAdapter(getActivity(), deadlineList, this);
+//        recyclerView.setAdapter(adapter);
+
+    }
+
+    public void updateDeadlineAdapter() {
+        loadDeadlineList();
         adapter = new DeadlineAdapter(getActivity(), deadlineList, this);
         recyclerView.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
@@ -174,6 +245,10 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
+    public void errorUpdatingDeadlineAdapter() {
+        loadDeadlineList();
+    }
+
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
@@ -182,10 +257,13 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void loadDeadlineList() {
-//        Net.queryDeadlineList();
-        User currentUser = currentUserListener.getCurrentUserDeadline();
         if (manager != null) {
-            deadlineList = manager.queryDeadline(currentUser.getUsername(), false);
+            if (Net.isLogin) {
+                deadlineList = manager.queryDeadline(Net.username, false);
+            } else {
+                deadlineList = manager.queryDeadline("local", false);
+            }
+
 //            deadlineList = manager.queryByWhere(Deadline.class, "username", args);
             Collections.sort(deadlineList, DeadlineComparator.INSTANCE);
         }
@@ -244,6 +322,5 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
         return bigBitmap;
     }
-
 
 }

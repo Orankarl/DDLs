@@ -33,6 +33,15 @@ public class DatabaseManager {
         return manager;
     }
 
+    public static int insertDeadlines(List<Deadline> list) {
+        if (manager == null) return 1;
+        else {
+            manager.insertAll(list);
+            return 0;
+        }
+
+    }
+
     public <T> long insert(T t) {
         return liteOrm.save(t);
     }

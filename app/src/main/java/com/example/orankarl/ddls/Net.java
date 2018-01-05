@@ -113,7 +113,7 @@ public class Net {
                     .build();
             Response response = client.newCall(request).execute();
 
-            Log.d("return value", response.body().string());
+//            Log.d("return value", response.body().string());
 
             JSONObject jsonObject = new JSONObject(response.body().string());
             String status = jsonObject.getString("status");
@@ -125,14 +125,21 @@ public class Net {
                 List<Deadline> deadlineList = new ArrayList<>();
                 for (int i = 0; i < len; i++) {
                     JSONObject json = array.getJSONObject(i);
-//                    deadlineList.add()
+                    Log.d("deadlines", json.getString("time"));
+                    deadlineList.add(new Deadline(json.getLong("id"),
+                            json.getLong("time"), json.getString("title"),
+                            json.getString("description"), Net.username));
                 }
-
+                int code = DatabaseManager.insertDeadlines(deadlineList);
+                if (code == 0) return "";
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "";
+    }
+
+    public static String addDeadline(Deadline deadline) {
         return "";
     }
 

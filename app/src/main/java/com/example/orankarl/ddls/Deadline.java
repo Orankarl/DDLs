@@ -18,7 +18,7 @@ import kotlin.Function;
  */
 @Table("tb_deadline")
 public class Deadline {
-    @PrimaryKey(AssignType.AUTO_INCREMENT)
+    @PrimaryKey(AssignType.BY_MYSELF)
     private long id;
     @NotNull
     private long calendarMillis;
@@ -33,7 +33,8 @@ public class Deadline {
     @Default("false")
     private boolean finished;
 
-    public Deadline(long calendarMillis, String title, String info, String userName) {
+    public Deadline(long id, long calendarMillis, String title, String info, String userName) {
+        this.id = id;
         this.calendarMillis = calendarMillis;
         this.title = title;
         this.info = info;

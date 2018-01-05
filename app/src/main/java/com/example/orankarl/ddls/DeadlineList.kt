@@ -48,7 +48,7 @@ class DeadlineList() {
                 +" "+calendar.get(Calendar.DAY_OF_MONTH).toString())
         if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1) return 2
 //        deadLineList.add(Deadline(calendar, title, info))
-        val deadline = Deadline(calendar.timeInMillis, title, info, user.username)
+//        val deadline = Deadline(calendar.timeInMillis, title, info, user.username)
 //        deadline.save()
         return 0
     }
