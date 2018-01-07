@@ -3,6 +3,8 @@ package com.example.orankarl.ddls;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,9 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -29,10 +33,12 @@ import java.util.Random;
  */
 
 public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+    public static final int QUERY_SUCCESS = 0, QUERY_ERROR = 1;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View view;
     private RecyclerView recyclerView;
     private List<Notice> noticeList;
+    private MyHandler handler = new MyHandler(this);
     DatabaseManager manager;
 
     NoticeCurrentUserGetter currentUserGetter;
@@ -76,8 +82,62 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onRefresh() {
-        loadNoticeList();
+        queryNotice();
+//        loadNoticeList();
 //        noticeList.loadNoticeList(currentUserGetter.getCurrentUserNotice());
+//        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+//        recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
+//        swipeRefreshLayout.setRefreshing(false);
+//        recyclerView = view.findViewById(R.id.notice_recyclerview);
+//        TextView textView = view.findViewById(R.id.notice_empty_text);
+//        if (noticeList.isEmpty()) {
+//            recyclerView.setVisibility(View.GONE);
+//            textView.setVisibility(View.VISIBLE);
+//        } else {
+//            recyclerView.setVisibility(View.VISIBLE);
+//            textView.setVisibility(View.GONE);
+//        }
+    }
+
+    private void setupRecyclerView(RecyclerView recyclerView) {
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
+    }
+
+    private void queryNotice() {
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.queryNotices();
+                    if (ret.equals("")) {
+                        Message message = new Message();
+                        message.what = NoticeFragment.QUERY_SUCCESS;
+                        handler.sendMessage(message);
+                    } else {
+                        Message message = new Message();
+                        message.what = NoticeFragment.QUERY_ERROR;
+                        message.obj = ret;
+                        handler.sendMessage(message);
+                    }
+                }
+            }).start();
+        } else {
+            updateNoticeAdapter();
+        }
+    }
+
+    private void loadNoticeList() {
+        if (manager != null) {
+//            noticeList = manager.queryNotice(currentUserGetter.getCurrentUserNotice().getUsername());
+            noticeList = manager.queryAll(Notice.class);
+            Collections.sort(noticeList, NoticeComparator.INSTANCE);
+            if (noticeList != null) Log.d("notice", String.valueOf(noticeList.size()));
+        }
+    }
+
+    private void updateNoticeAdapter() {
+        loadNoticeList();
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
         swipeRefreshLayout.setRefreshing(false);
@@ -89,21 +149,6 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         } else {
             recyclerView.setVisibility(View.VISIBLE);
             textView.setVisibility(View.GONE);
-        }
-    }
-
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-//        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter((new SimpleRecyclerViewAdapter(getActivity(), noticeList)));
-    }
-
-    private void loadNoticeList() {
-        if (manager != null) {
-            noticeList = manager.queryNotice(currentUserGetter.getCurrentUserNotice().getUsername());
-//            noticeList = manager.queryAll(Notice.class);
-            Collections.sort(noticeList, NoticeComparator.INSTANCE);
-            if (noticeList != null) Log.d("notice", String.valueOf(noticeList.size()));
         }
     }
 
@@ -163,6 +208,30 @@ public class NoticeFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         public int getItemCount() {
             return values.size();
+        }
+    }
+
+    private static class MyHandler extends Handler {
+        private final WeakReference<NoticeFragment> fragmentWeakReference;
+        MyHandler(NoticeFragment fragment) {
+            fragmentWeakReference = new WeakReference<NoticeFragment>(fragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case NoticeFragment.QUERY_SUCCESS:
+                    fragmentWeakReference.get().updateNoticeAdapter();
+                    break;
+                case NoticeFragment.QUERY_ERROR:
+                    String ret = (String)msg.obj;
+                    Toast.makeText(fragmentWeakReference.get().getContext(), ret, Toast.LENGTH_SHORT).show();
+                    fragmentWeakReference.get().updateNoticeAdapter();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

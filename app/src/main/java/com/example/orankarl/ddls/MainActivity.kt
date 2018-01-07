@@ -109,23 +109,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun refreshDeadlineFragment() {
-        val fragmentManager = supportFragmentManager
-        for (fragment in fragmentManager.fragments) {
-            if (fragment != null && fragment is DeadlineFragment) {
-                fragment.updateDeadlineAdapter()
-            }
-        }
-    }
+//    private fun refreshDeadlineFragment() {
+//        val fragmentManager = supportFragmentManager
+//        for (fragment in fragmentManager.fragments) {
+//            if (fragment != null && fragment is DeadlineFragment) {
+//                fragment.updateDeadlineAdapter()
+//            }
+//        }
+//    }
 
-    private fun errorRefreshingDeadlineFragment() {
-        val fragmentManager = supportFragmentManager
-        for (fragment in fragmentManager.fragments) {
-            if (fragment != null && fragment is DeadlineFragment) {
-                fragment.errorUpdatingDeadlineAdapter()
-            }
-        }
-    }
+//    private fun errorRefreshingDeadlineFragment() {
+//        val fragmentManager = supportFragmentManager
+//        for (fragment in fragmentManager.fragments) {
+//            if (fragment != null && fragment is DeadlineFragment) {
+//                fragment.errorUpdatingDeadlineAdapter()
+//            }
+//        }
+//    }
 
     private fun initDatabase() {
         pref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -165,11 +165,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                currentUser.username))
 
         manager.deleteAll(Notice::class.java)
-        manager.insert(Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 12, 25).timeInMillis, "作业通知", "数值计算", "P535:1(b),2", currentUser.username))
-        manager.insert(Notice(getNewCalendar(2017, 12, 21).timeInMillis, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
+//        manager.insert(Notice(1, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
+//        manager.insert(Notice(2, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
+//        manager.insert(Notice(3, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
+//        manager.insert(Notice(4, "作业通知", "数值计算", "P535:1(b),2", currentUser.username))
+//        manager.insert(Notice(5, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
 
         manager.deleteAll(Course::class.java)
         manager.insert(Course(1, "人工智能", currentUser.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
@@ -297,16 +297,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
                             val calendar1 = Calendar.getInstance()
-                            val deadline = Deadline(-1, calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username)
+                            val deadline = Deadline(-1, calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username, false)
                             if (title.text.isEmpty()) {
                                 Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
                             }
                             else if (CalendarComparator.INSTANCE.compare(calendar1, calendar) == 1)
                                 Toast.makeText(this, "Cannot add a past deadline", Toast.LENGTH_SHORT).show()
                             else {
-                                manager.insert(deadline)
-                                fragment.onRefresh()
-                                Toast.makeText(this, "New deadline added successfully", Toast.LENGTH_SHORT).show()
+                                fragment.addNewDeadline(deadline)
+//                                manager.insert(deadline)
+//                                fragment.onRefresh()
+
                             }
 
                         }
@@ -392,6 +393,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val fragmentManager = supportFragmentManager
         for (fragment in fragmentManager.fragments) {
             if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
+                fragment.onRefresh()
+            }
+            if (fragment != null && fragment.isVisible && fragment is NoticeFragment) {
                 fragment.onRefresh()
             }
         }

@@ -17,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.SwipeDismissBehavior;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.RatingCompat;
@@ -101,7 +102,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 //        activity = (Activity) context;
     }
 
-    public void reloadDeadline() {
+    public void queryDeadline() {
         if (Net.isLogin) {
             new Thread(new Runnable() {
                 @Override
@@ -195,7 +196,7 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
         Log.d("refresh", "yes");
         if (Net.isLogin) {
             Log.d("isLogin", "Yes");
-            reloadDeadline();
+            queryDeadline();
         } else {
             Log.d("isLogin", "No");
             updateDeadlineAdapter();
@@ -224,12 +225,15 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void addNewDeadline(final Deadline deadline) {
+        Log.d("isLogin", String.valueOf(Net.isLogin));
         if (Net.isLogin) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     String ret = Net.addDeadline(deadline);
-                    if (Character.isDigit(ret.indexOf(0))) {
+                    Log.d("isDigit", String.valueOf(Character.isDigit(ret.charAt(0))));
+                    Log.d("FirstDigit", String.valueOf(ret.charAt(0)));
+                    if (Character.isDigit(ret.charAt(0))) {
                         long id = Long.parseLong(ret);
                         Message msg = new Message();
                         msg.what = ADD_SUCCESS;
@@ -244,15 +248,17 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
                 }
             }).start();
+        } else {
+            Toast.makeText(getContext(), "Please login at first", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public int insertDeadlineDB(Deadline deadline) {
+    public void afterAddDeadline(Deadline deadline) {
         if (manager != null) {
             manager.insert(deadline);
-            return 0;
+            Toast.makeText(getContext(), "New deadline added successfully", Toast.LENGTH_SHORT).show();
+            updateDeadlineAdapter();
         }
-        return 1;
     }
 
 
@@ -351,7 +357,14 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                 case  DeadlineFragment.ADD_SUCCESS:
                     Deadline deadline = (Deadline) msg.obj;
                     int id = msg.arg1;
-                    deadline
+                    deadline.setId(id);
+                    Log.d("Add Success", "true");
+                    fragmentWeakReference.get().afterAddDeadline(deadline);
+                    break;
+                case DeadlineFragment.ADD_ERROR:
+                    String reason = (String) msg.obj;
+                    Toast.makeText(fragmentWeakReference.get().getContext(), reason, Toast.LENGTH_SHORT).show();
+                    break;
                 default:
                     break;
             }

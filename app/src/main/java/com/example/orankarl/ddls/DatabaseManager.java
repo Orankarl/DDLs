@@ -39,7 +39,20 @@ public class DatabaseManager {
             manager.insertAll(list);
             return 0;
         }
+    }
 
+    public static int insertNotices(List<Notice> list) {
+        if (manager == null) return 1;
+        else {
+            manager.insertAll(list);
+            return 0;
+        }
+    }
+
+    public static void deleteNotices() {
+        if (manager != null) {
+            manager.deleteAll(Notice.class);
+        }
     }
 
     public <T> long insert(T t) {

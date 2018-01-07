@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final EditText username = findViewById(R.id.login_username);
                 final EditText password = findViewById(R.id.login_password);
-                final Toast toast;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -60,34 +59,16 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         Button registerButton = findViewById(R.id.register_button);
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final EditText username = findViewById(R.id.login_username);
-                final EditText password = findViewById(R.id.login_password);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String retStr = Net.register(username.getText().toString(), password.getText().toString());
-                        if (retStr == "") {
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, "Register successfully", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        } else {
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, retStr, Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }).start();
-            }
-        });
+        if (registerButton != null) {
+            registerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, RegisterActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+
 
         Toolbar toolbar = findViewById(R.id.login_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_action_back_arrow);

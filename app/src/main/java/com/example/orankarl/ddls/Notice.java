@@ -13,10 +13,8 @@ import org.litepal.crud.DataSupport;
  */
 @Table("tb_notice")
 public class Notice {
-    @PrimaryKey(AssignType.AUTO_INCREMENT)
-    private Long id;
-    @NotNull
-    private Long calendarMillis;
+    @PrimaryKey(AssignType.BY_MYSELF)
+    private int id;
     @NotNull
     private String title;
     private String creator;
@@ -24,24 +22,20 @@ public class Notice {
     @Column("username")
     private String userName;
 
-    public Notice(Long calendarMillis, String title, String from, String info, String username) {
-        this.calendarMillis = calendarMillis;
+    public Notice(int id, String title, String from, String info, String username) {
+        this.id = id;
         this.title = title;
         this.creator = from;
         this.info = info;
         this.userName = username;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public Long getCalendarMillis() {
-        return calendarMillis;
-    }
-
-    public void setCalendarMillis(Long calendarMillis) {
-        this.calendarMillis = calendarMillis;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
