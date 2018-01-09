@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.icu.text.UnicodeSetSpanner;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +28,7 @@ import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +39,8 @@ public class FinishedDeadlineActivity extends AppCompatActivity implements Finis
     private String currentUsername;
     private FinishedDeadlineAdapter adapter;
     private DatabaseManager manager;
+    private MyHandler handler = new MyHandler(this);
+    public static final int UNFINISH_SUCCESS = 0, UNFINISH_ERROR = 1, DELETE_SUCCESS = 2, DELETE_ERROR = 3;
 
 
 
@@ -86,7 +92,7 @@ public class FinishedDeadlineActivity extends AppCompatActivity implements Finis
                 final int position = viewHolder.getAdapterPosition(); //swiped position
                 adapter.values.remove(position);
                 adapter.notifyItemRemoved(position);
-                long id = -1;
+                int id = -1;
                 if (viewHolder instanceof FinishedDeadlineAdapter.ViewHolder) {
                     id = ((FinishedDeadlineAdapter.ViewHolder) viewHolder).id;
                 }
@@ -193,46 +199,74 @@ public class FinishedDeadlineActivity extends AppCompatActivity implements Finis
 
     }
 
-    public void unfinishItem(final long id, final int position) {
-        if (manager != null) {
-            final Deadline finishedDeadline = manager.queryById(Deadline.class, id);
-            finishedDeadline.setFinished(false);
-            manager.update(finishedDeadline);
-            Log.d("unfinish", String.valueOf(manager.queryDeadline(currentUsername, false)));
-//            FinishedDeadlineList.Companion.deleteFinishedDeadline(id);
-            Snackbar.make(getWindow().getDecorView().getRootView(), "Undo the unfinish action?", Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.undo, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Deadline deadline = manager.queryById(Deadline.class, id);
-                            deadline.setFinished(true);
-                            manager.update(deadline);
-//                            DeadlineList.Companion.deleteDeadline(deadlineId);
-                            adapter.values.add(position, deadline);
-                            adapter.notifyItemInserted(position);
-                        }
-                    })
-                    .show();
+    public void unfinishItem(final int id, final int position) {
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.finishDeadline(id, false);
+                    if (ret.equals("")) {
+                        Message message = new Message();
+                        message.what = UNFINISH_SUCCESS;
+                        message.arg1 = id;
+                        message.arg2 = position;
+                        handler.sendMessage(message);
+                    } else {
+                        Message message = new Message();
+                        message.what = UNFINISH_ERROR;
+                        handler.sendMessage(message);
+                    }
+                }
+            }).start();
         }
-//        Deadline deadline = new Deadline(finishedDeadline);
-//        final long deadlineId = deadline.getId();
+        else {
+            afterUnfinishItem(id, position);
+        }
     }
 
-    public void deleteItem(final long id, final int position) {
+    public void afterUnfinishItem(int id, int position) {
         if (manager != null) {
-            final Deadline finishedDeadline = manager.queryById(Deadline.class, id);
-            manager.delete(finishedDeadline);
-            Snackbar.make(getWindow().getDecorView().getRootView(), "Undo the unfinish action?", Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.undo, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            manager.insert(finishedDeadline);
-//                            DeadlineList.Companion.deleteDeadline(deadlineId);
-                            adapter.values.add(position, finishedDeadline);
-                            adapter.notifyItemInserted(position);
-                        }
-                    })
-                    .show();
+            Deadline deadline = manager.queryById(Deadline.class, id);
+            deadline.setFinished(false);
+            manager.update(deadline);
+//            adapter.values.remove(position);
+//            adapter.notifyItemRemoved(position);
+            Toast.makeText(this, "Unfinish Successfully", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteItem(final int id, final int position) {
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.deleteDeadline(id);
+                    if (ret.equals("")) {
+                        Message message = new Message();
+                        message.what = DELETE_SUCCESS;
+                        message.arg1 = id;
+                        message.arg2 = position;
+                        handler.sendMessage(message);
+                    } else {
+                        Message message = new Message();
+                        message.what = DELETE_ERROR;
+                        handler.sendMessage(message);
+                    }
+                }
+            }).start();
+        }
+        else {
+            afterDeleteItem(id, position);
+        }
+    }
+
+    public void afterDeleteItem(int id, int position) {
+        if (manager != null) {
+            Deadline deadline = manager.queryById(Deadline.class, id);
+            manager.delete(deadline);
+//            adapter.values.remove(position);
+//            adapter.notifyItemRemoved(position);
+            Toast.makeText(this, "Delete Successfully", Toast.LENGTH_SHORT);
         }
     }
 
@@ -246,5 +280,33 @@ public class FinishedDeadlineActivity extends AppCompatActivity implements Finis
         if (manager != null)
         deadlineList = manager.queryDeadline(currentUsername, true);
         Collections.sort(deadlineList, FinishedDeadlineComparator.INSTANCE);
+    }
+
+    public static class MyHandler extends Handler {
+        private final WeakReference<FinishedDeadlineActivity> weakReference;
+        MyHandler(FinishedDeadlineActivity activity) {
+            weakReference = new WeakReference<FinishedDeadlineActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case FinishedDeadlineActivity.UNFINISH_SUCCESS:
+                    weakReference.get().afterUnfinishItem(msg.arg1, msg.arg2);
+                    break;
+                case FinishedDeadlineActivity.UNFINISH_ERROR:
+                    Toast.makeText(weakReference.get(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                    break;
+                case FinishedDeadlineActivity.DELETE_SUCCESS:
+                    weakReference.get().afterDeleteItem(msg.arg1, msg.arg2);
+                    break;
+                case FinishedDeadlineActivity.DELETE_ERROR:
+                    Toast.makeText(weakReference.get(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

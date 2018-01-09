@@ -29,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
                 final EditText username = findViewById(R.id.register_username);
                 final EditText password = findViewById(R.id.register_password);
                 final EditText stuNumber = findViewById(R.id.student_number);
+                final EditText nickName = findViewById(R.id.nick_name);
                 if (username.getText().toString().equals("")) {
                     Toast.makeText(context, "Username cannot be empty", Toast.LENGTH_SHORT).show();
                 } else if (stuNumber.getText().toString().equals("")) {
@@ -39,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            final String retStr = Net.register(username.getText().toString(), stuNumber.getText().toString(), password.getText().toString());
+                            final String retStr = Net.register(username.getText().toString(), stuNumber.getText().toString(), nickName.getText().toString(), password.getText().toString());
                             if (retStr.equals("")) {
                                 context.runOnUiThread(new Runnable() {
                                     @Override
@@ -68,7 +69,6 @@ public class RegisterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
 
 
         Window window = this.getWindow();

@@ -21,6 +21,8 @@ public class User{
     @NotNull
     @Column("username")
     private String username;
+    @Column("nickname")
+    private String nickname;
 //    private List<Deadline> deadlineList = new ArrayList<Deadline>();
 
     public String getUsername() {

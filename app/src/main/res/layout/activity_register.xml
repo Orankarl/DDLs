@@ -74,6 +74,23 @@
 
             <android.support.design.widget.TextInputEditText
                 android:textColor="@color/md_black_1000"
+                android:id="@+id/nick_name"
+                android:shadowColor="@color/colorAccent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nickname" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/TextAppearence.App.TextInputLayout"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textColorHint="@color/md_grey_500"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:textColor="@color/md_black_1000"
                 android:shadowColor="@color/colorAccent"
                 android:id="@+id/register_password"
                 android:layout_width="match_parent"

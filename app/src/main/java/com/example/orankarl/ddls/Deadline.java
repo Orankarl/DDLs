@@ -19,7 +19,7 @@ import kotlin.Function;
 @Table("tb_deadline")
 public class Deadline {
     @PrimaryKey(AssignType.BY_MYSELF)
-    private long id;
+    private int id;
     @NotNull
     private long calendarMillis;
     @Column("finishedMillis")
@@ -33,7 +33,7 @@ public class Deadline {
     @Default("false")
     private boolean finished;
 
-    public Deadline(long id, long calendarMillis, String title, String info, String userName, boolean done) {
+    public Deadline(int id, long calendarMillis, String title, String info, String userName, boolean done) {
         this.id = id;
         this.calendarMillis = calendarMillis;
         this.title = title;
@@ -50,13 +50,13 @@ public class Deadline {
         this.userName = deadline.getUserName();
     }
 
-    public Deadline(FinishedDeadline finishedDeadline) {
-        this.id = finishedDeadline.getId();
-        this.calendarMillis = finishedDeadline.getCalendarMillis();
-        this.title = finishedDeadline.getTitle();
-        this.info = finishedDeadline.getInfo();
-        this.userName = finishedDeadline.getUserName();
-    }
+//    public Deadline(FinishedDeadline finishedDeadline) {
+//        this.id = finishedDeadline.getId();
+//        this.calendarMillis = finishedDeadline.getCalendarMillis();
+//        this.title = finishedDeadline.getTitle();
+//        this.info = finishedDeadline.getInfo();
+//        this.userName = finishedDeadline.getUserName();
+//    }
 
     public long getFinishedMillis() {
         return finishedMillis;
@@ -74,11 +74,11 @@ public class Deadline {
         this.finished = finished;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

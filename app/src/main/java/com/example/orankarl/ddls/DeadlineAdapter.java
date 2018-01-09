@@ -47,8 +47,8 @@ public class DeadlineAdapter
 
     public interface onRefreshListener {
 //        void reloadDeadline();
-        void undoDeleteDeadline(Deadline deadline, int position);
-        void undoFinishDeadline(Long finishedDeadlineId, int position);
+        void deleteDeadline(int id, int position);
+        void finishDeadline(int finishedDeadlineId, int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -99,7 +99,7 @@ public class DeadlineAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Deadline deadline = values.get(position);
-        final long id = deadline.getId();
+        final int id = deadline.getId();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(deadline.getCalendarMillis());
         String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
@@ -195,8 +195,6 @@ public class DeadlineAdapter
         GradientDrawable gradientDrawable = (GradientDrawable) holder.rightStrip.getBackground();
         gradientDrawable.setColor(randomAndroidColor);
 
-        final DeadlineAdapter adapter = this;
-
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -212,34 +210,11 @@ public class DeadlineAdapter
                                 DatabaseManager manager = DatabaseManager.getInstance(view.getContext());
                                 switch (which) {
                                     case NEUTRAL:{
-                                        final Deadline permanentDeadline = manager.queryById(Deadline.class, id);
-                                        manager.delete(permanentDeadline);
-//                                        final Deadline permanentDeadline = DeadlineList.Companion.queryDeadline(id);
-//                                        DeadlineList.Companion.deleteDeadline(id);
-                                        values.remove(position);
-                                        adapter.notifyItemRemoved(position);
-                                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
-                                        refreshListener.undoDeleteDeadline(permanentDeadline, position);
+                                        refreshListener.deleteDeadline(id, position);
                                         break;
                                     }
                                     case POSITIVE:{
-                                        final Deadline permanentDeadline = manager.queryById(Deadline.class, id);
-                                        permanentDeadline.setFinished(true);
-                                        Calendar calendar2 = Calendar.getInstance();
-                                        permanentDeadline.setFinishedMillis(calendar2.getTimeInMillis());
-                                        if (manager != null)
-                                            manager.update(permanentDeadline);
-                                        values.remove(position);
-                                        adapter.notifyItemRemoved(position);
-                                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
-                                        refreshListener.undoFinishDeadline(id, position);
-//                                        DeadlineList.Companion.deleteDeadline(id);
-//                                        FinishedDeadline newFinishedDeadline = new FinishedDeadline(permanentDeadline, Calendar.getInstance().getTimeInMillis());
-//                                        values.remove(position);
-//                                        adapter.notifyItemRemoved(position);
-//                                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
-//                                        refreshListener.reloadDeadline();
-//                                        refreshListener.undoFinishDeadline(permanentDeadline, newFinishedDeadline.getId(), position);
+                                        refreshListener.finishDeadline(id, position);
                                         break;
                                     }
                                     default:break;

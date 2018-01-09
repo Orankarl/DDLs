@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.GradientDrawable;
+import android.nfc.tech.IsoDep;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -67,7 +68,8 @@ import static android.view.View.resolveSize;
  */
 
 public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, DeadlineAdapter.onRefreshListener {
-    public static final int QUERY_FINISHED = 0, QUERY_ERROR = 1, ADD_SUCCESS = 2, ADD_ERROR = 3;
+    public static final int QUERY_FINISHED = 0, QUERY_ERROR = 1, ADD_SUCCESS = 2, ADD_ERROR = 3,
+            FINISH_SUCCESS = 4, FINISH_ERROR = 5, DELETE_SUCCESS = 6, DELETE_ERROR = 7;
 
 //    private Activity activity;
 
@@ -124,49 +126,78 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void undoDeleteDeadline(final Deadline deadline, final int position) {
-        final Deadline newDeadline = new Deadline(deadline);
-        Snackbar.make(view, "Undo the delete action?", Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (manager != null) {
-                            manager.insert(newDeadline);
-                        }
-                        adapter.values.add(position, newDeadline);
-                        onRefresh();
-//                        adapter.notifyDataSetChanged();
-//                        adapter.notifyItemRangeChanged(position, adapter.getItemCount());
+    public void deleteDeadline(final int id, final int position) {
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.deleteDeadline(id);
+                    if (ret.equals("")) {
+                        Message message = new Message();
+                        message.what = DeadlineFragment.DELETE_SUCCESS;
+                        message.arg1 = id;
+                        message.arg2 = position;
+                        handler.sendMessage(message);
+                    } else{
+                        Message message = new Message();
+                        message.what = DeadlineFragment.DELETE_ERROR;
+                        message.obj = ret;
+                        handler.sendMessage(message);
                     }
-                })
-                .show();
+                }
+            }).start();
+        }
+        else {
+            afterDeleteDeadline(id, position);
+        }
+    }
+
+    public void afterDeleteDeadline(int id, int position) {
+        if (manager != null) {
+            Deadline deadline = manager.queryById(Deadline.class, id);
+            manager.delete(deadline);
+            adapter.values.remove(position);
+            adapter.notifyItemRemoved(position);
+            Toast.makeText(getContext(), "Deadline deleted", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void undoFinishDeadline(final Long finishedDeadlineId, final int position) {
-        Snackbar.make(view, "Undo the finish action?", Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        manager = DatabaseManager.getInstance(getContext());
-                        if (manager != null) {
-                            Deadline deadline = manager.queryById(Deadline.class, finishedDeadlineId);
-                            if (deadline != null) {
-                                deadline.setFinished(false);
-                            }
-                            manager.update(deadline);
-                            adapter.values.add(position, deadline);
-                            onRefresh();
-                        }
-//                        newDeadline.save();
-//                        FinishedDeadlineList.Companion.deleteFinishedDeadline(finishedDeadlineId);
-//                        adapter.values.addItem(position, newDeadline);
-//                        onRefresh();
-//                        adapter.notifyDataSetChanged();
-//                        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    public void finishDeadline(final int finishedDeadlineId, final int position) {
+        if (Net.isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String ret = Net.finishDeadline(finishedDeadlineId, true);
+                    if (ret.equals("")) {
+                        Message message = new Message();
+                        message.what = DeadlineFragment.FINISH_SUCCESS;
+                        message.arg1 = finishedDeadlineId;
+                        message.arg2 = position;
+                        handler.sendMessage(message);
+                    } else{
+                        Message message = new Message();
+                        message.what = DeadlineFragment.FINISH_ERROR;
+                        message.obj = ret;
+                        handler.sendMessage(message);
                     }
-                })
-                .show();
+                }
+            }).start();
+        } else {
+            afterFinishDeadline(finishedDeadlineId, position);
+        }
+
+    }
+
+    public void afterFinishDeadline(int id, int position) {
+        if (manager != null) {
+            Deadline finishedDeadline = manager.queryById(Deadline.class, id);
+            finishedDeadline.setFinished(true);
+            manager.update(finishedDeadline);
+            adapter.values.remove(position);
+            adapter.notifyItemRemoved(position);
+            Toast.makeText(getContext(), "Congratulations!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Nullable
@@ -174,7 +205,6 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_deadline, container, false);
         recyclerView = view.findViewById(R.id.deadline_recyclerview);
-//        handler = new MainActivity.Companion.MyHandler((MainActivity) getActivity());
         swipeRefreshLayout = view.findViewById(R.id.deadline_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -270,6 +300,9 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private void loadDeadlineList() {
         if (manager != null) {
+            if (deadlineList != null) {
+                deadlineList.clear();
+            }
             if (Net.isLogin) {
                 deadlineList = manager.queryDeadline(Net.username, false);
                 Log.d("listSize", String.valueOf(deadlineList.size()));
@@ -365,6 +398,18 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
                     String reason = (String) msg.obj;
                     Toast.makeText(fragmentWeakReference.get().getContext(), reason, Toast.LENGTH_SHORT).show();
                     break;
+                case DeadlineFragment.FINISH_SUCCESS:
+                    fragmentWeakReference.get().afterFinishDeadline(msg.arg1, msg.arg2);
+                    break;
+                case DeadlineFragment.FINISH_ERROR:
+                    String finish_reason = (String) msg.obj;
+                    Toast.makeText(fragmentWeakReference.get().getContext(), finish_reason, Toast.LENGTH_SHORT).show();
+                case DeadlineFragment.DELETE_SUCCESS:
+                    fragmentWeakReference.get().afterDeleteDeadline(msg.arg1, msg.arg2);
+                    break;
+                case DeadlineFragment.DELETE_ERROR:
+                    String delete_reason = (String) msg.obj;
+                    Toast.makeText(fragmentWeakReference.get().getContext(), delete_reason, Toast.LENGTH_SHORT).show();
                 default:
                     break;
             }

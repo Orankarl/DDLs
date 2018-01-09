@@ -37,14 +37,24 @@ public class LoginActivity extends AppCompatActivity {
                     public void run() {
                         final String retStr = Net.login(username.getText().toString(), password.getText().toString());
 
-                        if (retStr == "") {
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, "Login successfully", Toast.LENGTH_SHORT).show();
-                                    context.onBackPressed();
-                                }
-                            });
+                        if (retStr.equals("")) {
+                            final String infoStr = Net.getInfo();
+                            if (infoStr.equals("")) {
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, "Login successfully", Toast.LENGTH_SHORT).show();
+                                        context.onBackPressed();
+                                    }
+                                });
+                            } else {
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, infoStr, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         } else {
                             context.runOnUiThread(new Runnable() {
                                 @Override

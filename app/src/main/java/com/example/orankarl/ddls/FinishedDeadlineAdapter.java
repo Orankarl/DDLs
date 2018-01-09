@@ -13,6 +13,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.Calendar;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 
@@ -28,14 +29,14 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
     private DialogListener dialogListener;
 
     public interface DialogListener {
-        void unfinishItem(final long id, final int position);
-        void deleteItem(final long id, final int position);
+        void unfinishItem(final int id, final int position);
+        void deleteItem(final int id, final int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView title, info, date, year;
-        public long id;
+        public int id;
 
         public ViewHolder(View view) {
             super(view);
@@ -62,7 +63,7 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Deadline finishedDeadline = values.get(position);
         holder.id = finishedDeadline.getId();
         Calendar calendar = Calendar.getInstance();
@@ -97,8 +98,10 @@ public class FinishedDeadlineAdapter extends RecyclerView.Adapter<FinishedDeadli
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 switch (which) {
                                     case NEUTRAL:
+                                        dialogListener.deleteItem(holder.id, position);
                                         break;
                                     case POSITIVE:
+                                        dialogListener.unfinishItem(holder.id, position);
                                         break;
                                     default:break;
                                 }

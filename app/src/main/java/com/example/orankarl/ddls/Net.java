@@ -27,9 +27,8 @@ public class Net {
     private static String url = "http://ddl.strickerlee.tk";
     public static boolean isLogin = false;
     public static String token = "";
-    public static String userId;
     public static OkHttpClient client;
-    public static String username;
+    public static String username, nickname, stuID;
 
     public static String login(String username, String password) {
         try {
@@ -69,7 +68,12 @@ public class Net {
         return "No response";
     }
 
-    public static String register(String username, String stuNumber, String password) {
+    public static void logOut() {
+        Net.token = "";
+        Net.isLogin = false;
+    }
+
+    public static String register(String username, String stuNumber, String nickName, String password) {
         try {
             if (client == null) client = new OkHttpClient();
             OkHttpClient client = new OkHttpClient();
@@ -77,7 +81,7 @@ public class Net {
                     .add("username", username)
                     .add("stuid", stuNumber)
                     .add("password", password)
-                    .add("nickname", "2333")
+                    .add("nickname", nickName)
                     .build();
             Request request = new Request.Builder()
                     .url(url+"/api/user")
@@ -85,18 +89,51 @@ public class Net {
                     .build();
             Response response = client.newCall(request).execute();
             JSONObject jsonObject = new JSONObject(response.body().string());
-            //parseObject
+            String status = jsonObject.getString("status");
+            String reason = jsonObject.getString("reason");
+            if (status.equals("1")) {
+                return "";
+            } else {
+                return reason;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "No response";
+    }
+
+    public static String getInfo() {
+        try {
+            if (client == null) client = new OkHttpClient();
+
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
+            params.put("token", Net.token);
+            Request request = new Request.Builder()
+                    .url(attachHttpGetParams(url+"/api/user", params))
+                    .build();
+            Response response = client.newCall(request).execute();
+
+//            Log.d("return value", response.body().string());
+
+            JSONObject jsonObject = new JSONObject(response.body().string());
 //            JSONArray jsonArray = new JSONArray(response.body().string());
-//            Log.d("jsonlen", String.valueOf(jsonArray.length()));
+//            //parseObject
 //            for (int i = 0; i < jsonArray.length(); i++) {
 //                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String status = jsonObject.getString("status");
-                String reason = jsonObject.getString("reason");
-                if (status.equals("1")) {
-                    return "";
-                } else {
-                    return reason;
-                }
+            String status = jsonObject.getString("status");
+            String reason = jsonObject.getString("reason");
+
+            if (status.equals("1")) {
+                String username = jsonObject.getString("username");
+                String nickname = jsonObject.getString("nickname");
+                String stuid = jsonObject.getString("stuid");
+                Net.nickname = nickname;
+                Net.username = username;
+                Net.stuID = stuid;
+                return "";
+            } else {
+                return reason;
+            }
 //            }
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +166,7 @@ public class Net {
                 List<Deadline> deadlineList = new ArrayList<>();
                 for (int i = 0; i < len; i++) {
                     JSONObject json = array.getJSONObject(i);
-                    deadlineList.add(new Deadline(json.getLong("id"),
+                    deadlineList.add(new Deadline(json.getInt("id"),
                             json.getLong("time"), json.getString("title"),
                             json.getString("description"), Net.username, (json.getInt("done") != 0)));
                 }
@@ -215,7 +252,65 @@ public class Net {
         return "No Response";
     }
 
-    public static String finishDeadline(Deadline deadline) {
+    public static String finishDeadline(int id, boolean finished) {
+        try {
+            if (client == null) client = new OkHttpClient();
+            OkHttpClient client = new OkHttpClient();
+            String done;
+            if (finished) done = "1";
+            else done = "0";
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("token", token)
+                    .add("done", done)
+                    .build();
+            Request request = new Request.Builder()
+                    .url(url+"/api/deadline/"+String.valueOf(id))
+                    .put(requestBody)
+                    .build();
+            Response response = client.newCall(request).execute();
+            String string = response.body().string();
+            Log.d("Finish Deadline", string);
+            JSONObject jsonObject = new JSONObject(string);
+            //parseObject
+            String status = jsonObject.getString("status");
+            String reason = jsonObject.getString("reason");
+            if (status.equals("1")) {
+                return "";
+            } else {
+                return reason;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "No Response";
+    }
+
+    public static String deleteDeadline(int id) {
+        try {
+            if (client == null) client = new OkHttpClient();
+            OkHttpClient client = new OkHttpClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("token", token)
+                    .build();
+            Request request = new Request.Builder()
+                    .url(url+"/api/deadline/"+String.valueOf(id))
+                    .delete(requestBody)
+                    .build();
+            Response response = client.newCall(request).execute();
+            String string = response.body().string();
+            Log.d("Finish Deadline", string);
+            JSONObject jsonObject = new JSONObject(string);
+            //parseObject
+            String status = jsonObject.getString("status");
+            String reason = jsonObject.getString("reason");
+            if (status.equals("1")) {
+                return "";
+            } else {
+                return reason;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "No Response";
     }
 

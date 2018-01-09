@@ -46,11 +46,15 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
         NoticeFragment.NoticeCurrentUserGetter, ChatListFragment.ChatCurrentUserListener {
-
+    companion object {
+        val LOAD_INFO_SUCCESS:Int = 0
+        val LOAD_INFO_ERROR:Int = 1
+    }
 //    private lateinit var dialog:AddDeadlineDialog
     private lateinit var adapter:MainActivity.Adapter
     private lateinit var currentUser:User
@@ -60,6 +64,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var lastUsername:String
     private var isLogin:Boolean = false
     private lateinit var headerView:View
+    private var handler = MyHandler(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         initDrawer()
 
+        loadToken()
         initDatabase()
     }
 
@@ -105,8 +111,54 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-    private fun setLocalUser() {
+    private fun loadToken() {
+        pref = PreferenceManager.getDefaultSharedPreferences(this)
+        Net.token = pref.getString("token", "")
+        if (Net.token != "") {
+            Net.isLogin = true
+            thread {
+                val ret = Net.getInfo()
+                if (ret == "") {
+                    val message = Message()
+                    message.what = MainActivity.Companion.LOAD_INFO_SUCCESS
+                    handler.sendMessage(message)
+                } else {
+                    val message = Message()
+                    message.what = MainActivity.Companion.LOAD_INFO_ERROR
+                    message.obj = ret
+                    handler.sendMessage(message)
+                }
+            }.run()
+        }
+    }
 
+    private fun setDrawerHead() {
+        if (Net.isLogin) {
+            headerView = nav_view.getHeaderView(0)
+            val drawerName = headerView.findViewById<TextView>(R.id.drawer_name)
+            drawerName.text = Net.username
+            val stu_id = headerView.findViewById<TextView>(R.id.stu_number)
+            stu_id.text = Net.stuID
+        }
+        else {
+            headerView = nav_view.getHeaderView(0)
+            val drawerName = headerView.findViewById<TextView>(R.id.drawer_name)
+            drawerName.text = "点击头像登录"
+            val stu_id = headerView.findViewById<TextView>(R.id.stu_number)
+            stu_id.text = ""
+        }
+    }
+
+    private fun saveToken() {
+        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        editor.putString("token", Net.token)
+        editor.apply()
+    }
+
+    private fun clearToken() {
+        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        editor.putString("token", "")
+        editor.apply()
     }
 
 //    private fun refreshDeadlineFragment() {
@@ -127,9 +179,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        }
 //    }
 
+
     private fun initDatabase() {
-        pref = PreferenceManager.getDefaultSharedPreferences(this)
-        lastUsername = pref.getString("username", "local")
         manager = DatabaseManager.getInstance(this.applicationContext)
         var users = manager.queryAll(User::class.java)
         if (users.isEmpty()) {
@@ -373,6 +424,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 intent.putExtra("CurrentUserName", currentUser.username)
                 startActivity(intent)
             }
+            R.id.nav_logout -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                Net.logOut()
+                setDrawerHead()
+            }
         }
 
         return true
@@ -399,10 +455,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment.onRefresh()
             }
         }
+        setDrawerHead()
         if (Net.isLogin) {
-            headerView = nav_view.getHeaderView(0)
-            val drawerName = headerView.findViewById<TextView>(R.id.drawer_name)
-            drawerName.setText(Net.username)
+            saveToken()
+        } else {
+            clearToken()
         }
     }
 
@@ -433,6 +490,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month-1)
             set(Calendar.DAY_OF_MONTH, day)
+        }
+    }
+
+    class MyHandler(val activity:MainActivity): Handler() {
+        private var fragmentWeakReference:WeakReference<MainActivity> = WeakReference(activity)
+
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+            if (msg != null) {
+                when(msg.what) {
+                    MainActivity.Companion.LOAD_INFO_SUCCESS->{
+                        activity.setDrawerHead()
+                    }
+                    MainActivity.Companion.LOAD_INFO_ERROR->{
+                        Toast.makeText(activity, msg.obj as String, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
         }
     }
 }
