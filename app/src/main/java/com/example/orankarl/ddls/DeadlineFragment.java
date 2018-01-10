@@ -347,16 +347,16 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
             viewHolder.itemView.buildDrawingCache();
             canvas.drawBitmap(viewHolder.itemView.getDrawingCache(), 0f, iHeight, paint);
 
-            viewHolder.textView3.setDrawingCacheEnabled(true);
-            viewHolder.textView3.buildDrawingCache();
-            canvas.drawBitmap(viewHolder.textView3.getDrawingCache(), 3f, iHeight, paint);
-            viewHolder.textView3.setDrawingCacheEnabled(false);
-            viewHolder.textView3.destroyDrawingCache();
-            viewHolder.textView4.setDrawingCacheEnabled(true);
-            viewHolder.textView4.buildDrawingCache();
-            canvas.drawBitmap(viewHolder.textView4.getDrawingCache(), 3f, iHeight+viewHolder.textView3.getMeasuredHeight(), paint);
-            viewHolder.textView4.setDrawingCacheEnabled(false);
-            viewHolder.textView4.destroyDrawingCache();
+//            viewHolder.textView3.setDrawingCacheEnabled(true);
+//            viewHolder.textView3.buildDrawingCache();
+//            canvas.drawBitmap(viewHolder.textView3.getDrawingCache(), 3f, iHeight, paint);
+//            viewHolder.textView3.setDrawingCacheEnabled(false);
+//            viewHolder.textView3.destroyDrawingCache();
+//            viewHolder.textView4.setDrawingCacheEnabled(true);
+//            viewHolder.textView4.buildDrawingCache();
+//            canvas.drawBitmap(viewHolder.textView4.getDrawingCache(), 3f, iHeight+viewHolder.textView3.getMeasuredHeight(), paint);
+//            viewHolder.textView4.setDrawingCacheEnabled(false);
+//            viewHolder.textView4.destroyDrawingCache();
 
             View cardView = viewHolder.cardView;
 //            viewHolder.cardView.setDrawingCacheEnabled(true);

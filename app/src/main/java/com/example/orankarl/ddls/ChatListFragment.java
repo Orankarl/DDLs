@@ -37,6 +37,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private static final int NAME_MAX_LEN = 8;
     ChatCurrentUserListener chatCurrentUserListener;
     RecyclerView recyclerView;
+    List<Course> chatList;
 
     public interface ChatCurrentUserListener {
         User getCurrentUserChat();
@@ -68,29 +69,33 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 onRefresh();
             }
         });
-        setupRecyclerView(recyclerView);
+
         manager = DatabaseManager.getInstance(this.getContext());
+        getChatList();
+        setupRecyclerView(recyclerView);
         return view;
     }
 
     @Override
     public void onRefresh() {
-        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), getChatList())));
+        getChatList();
+        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), chatList)));
         swipeRefreshLayout.setRefreshing(false);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), getChatList())));
+        recyclerView.setAdapter((new SimpleStringRecyclerViewAdapter(getActivity(), chatList)));
         recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
     }
 
-    private List<Course> getChatList() {
+    private void getChatList() {
         if (manager != null) {
-            List<Course> chatList = manager.queryCourse(Net.username);
-            return chatList;
+//            chatList = manager.queryCourse(Net.username);
+            chatList = manager.queryAll(Course.class);
+            Log.d("username", Net.username);
+            Log.d("Chat", String.valueOf(chatList.size()));
         }
-        return null;
     }
 
     public static class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {

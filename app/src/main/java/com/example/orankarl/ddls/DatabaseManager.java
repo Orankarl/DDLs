@@ -133,7 +133,7 @@ public class DatabaseManager {
 
     public List<Course> queryCourseById(long course_id) {
         return liteOrm.query(new QueryBuilder<Course>(Course.class)
-        .where("course_id = ?", course_id));
+        .where("id = ?", course_id));
     }
 
     @SuppressWarnings("unchecked")

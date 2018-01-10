@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //            currentUser = manager.queryByWhere(User::class.java, "username", Array(1){lastUsername})[0]
 //        }
 
-//        manager.deleteAll(Deadline::class.java)
+        manager.deleteAll(Deadline::class.java)
 //        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
 //                "组合数学作业",
 //                "第十三次",
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                "Building neural network by C++ (Without using any existing package).",
 //                currentUser.username))
 
-//        manager.deleteAll(Notice::class.java)
+        manager.deleteAll(Notice::class.java)
 //        manager.insert(Notice(1, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
 //        manager.insert(Notice(2, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
 //        manager.insert(Notice(3, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
@@ -223,10 +223,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        manager.insert(Notice(5, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
 
         manager.deleteAll(Course::class.java)
-//        manager.insert(Course(1, "人工智能", Net.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
-//        manager.insert(Course(2, "数据库系统原理", Net.username, Calendar.getInstance().timeInMillis, "B", "新年快乐", "大三第一学期"))
-//        manager.insert(Course(3, "高性能计算", Net.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候", "大三第一学期"))
-//        manager.insert(Course(4, "计算机图形学", Net.username, Calendar.getInstance().timeInMillis, "D", "还行", "大三第一学期"))
+        manager.insert(Course(1, "人工智能", Net.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
+        manager.insert(Course(2, "数据库系统原理", Net.username, Calendar.getInstance().timeInMillis, "B", "新年快乐", "大三第一学期"))
+        manager.insert(Course(3, "高性能计算", Net.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候", "大三第一学期"))
+        manager.insert(Course(4, "计算机图形学", Net.username, Calendar.getInstance().timeInMillis, "D", "还行", "大三第一学期"))
 
         manager.deleteAll(Msg::class.java)
         manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, Net.username, "C", "你好", Msg.LEFT))
@@ -427,6 +427,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_logout -> {
                 drawer_layout.closeDrawer(GravityCompat.START)
                 Net.logOut()
+                if (manager != null) {
+                    manager.deleteAll(Deadline::class.java)
+                    manager.deleteAll(Notice::class.java)
+                    manager.deleteAll(Course::class.java)
+                }
                 setDrawerHead()
                 clearToken()
             }
@@ -459,8 +464,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setDrawerHead()
         if (Net.isLogin) {
             saveToken()
+            val item = nav_view.menu.findItem(R.id.nav_logout)
+            item.isVisible = true
         } else {
             clearToken()
+            val item = nav_view.menu.findItem(R.id.nav_logout)
+            item.isVisible = false
         }
     }
 
