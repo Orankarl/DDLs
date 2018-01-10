@@ -9,9 +9,8 @@ import com.litesuits.orm.db.enums.AssignType;
  */
 @Table("tb_course")
 public class Course {
-    @PrimaryKey(AssignType.AUTO_INCREMENT)
-    private long id;
-    private long course_id;
+    @PrimaryKey(AssignType.BY_MYSELF)
+    private int id;
     private String title;
     private long user_id;
     private String username;
@@ -20,8 +19,8 @@ public class Course {
     private String latestMsg;
     private String semester;
 
-    Course(long id, String title, String username, long time, String latestName, String latestMsg, String semester) {
-        this.course_id = id;
+    Course(int id, String title, String username, long time, String latestName, String latestMsg, String semester) {
+        this.id = id;
         this.time = time;
         this.title = title;
         this.username = username;
@@ -30,23 +29,19 @@ public class Course {
         this.semester = semester;
     }
 
-    Course(long id, String title, String semester, String username) {
-        course_id = id;
+    Course(int id, String title, String semester, String username) {
+        this.id = id;
         this.title = title;
         this.semester = semester;
         this.username = username;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public long getCourse_id() {
-        return course_id;
-    }
-
-    public void setCourse_id(long course_id) {
-        this.course_id = course_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public long getUser_id() {

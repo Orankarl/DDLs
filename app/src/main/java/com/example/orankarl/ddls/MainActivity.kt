@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var manager:DatabaseManager
     private lateinit var pref:SharedPreferences
     private lateinit var editor:SharedPreferences.Editor
-    private lateinit var lastUsername:String
+    private var lastUsername:String = "local"
     private var isLogin:Boolean = false
     private lateinit var headerView:View
     private var handler = MyHandler(this)
@@ -182,18 +182,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initDatabase() {
         manager = DatabaseManager.getInstance(this.applicationContext)
-        var users = manager.queryAll(User::class.java)
-        if (users.isEmpty()) {
-            currentUser = User()
-            currentUser.username = lastUsername
-            manager.insert(currentUser)
-        } else if(users.size == 1) {
-            currentUser = manager.queryByWhere(User::class.java, "username", Array<String>(1){"local"})[0]
-        } else {
-            currentUser = manager.queryByWhere(User::class.java, "username", Array(1){lastUsername})[0]
-        }
+//        var users = manager.queryAll(User::class.java)
+//        if (users.isEmpty()) {
+//            currentUser = User()
+//            currentUser.username = lastUsername
+//            manager.insert(currentUser)
+//        } else if(users.size == 1) {
+//            currentUser = manager.queryByWhere(User::class.java, "username", Array<String>(1){"local"})[0]
+//        } else {
+//            currentUser = manager.queryByWhere(User::class.java, "username", Array(1){lastUsername})[0]
+//        }
 
-        manager.deleteAll(Deadline::class.java)
+//        manager.deleteAll(Deadline::class.java)
 //        manager.insert(Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
 //                "组合数学作业",
 //                "第十三次",
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                "Building neural network by C++ (Without using any existing package).",
 //                currentUser.username))
 
-        manager.deleteAll(Notice::class.java)
+//        manager.deleteAll(Notice::class.java)
 //        manager.insert(Notice(1, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser.username))
 //        manager.insert(Notice(2, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser.username))
 //        manager.insert(Notice(3, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser.username))
@@ -223,24 +223,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        manager.insert(Notice(5, "作业通知", "组合数学与数论", "第十四次作业，12.28上课时交", currentUser.username))
 
         manager.deleteAll(Course::class.java)
-        manager.insert(Course(1, "人工智能", currentUser.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
-        manager.insert(Course(2, "数据库系统原理", currentUser.username, Calendar.getInstance().timeInMillis, "B", "新年快乐", "大三第一学期"))
-        manager.insert(Course(3, "高性能计算", currentUser.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候", "大三第一学期"))
-        manager.insert(Course(4, "计算机图形学", currentUser.username, Calendar.getInstance().timeInMillis, "D", "还行", "大三第一学期"))
+//        manager.insert(Course(1, "人工智能", Net.username, Calendar.getInstance().timeInMillis, "A", "你好", "大三第一学期"))
+//        manager.insert(Course(2, "数据库系统原理", Net.username, Calendar.getInstance().timeInMillis, "B", "新年快乐", "大三第一学期"))
+//        manager.insert(Course(3, "高性能计算", Net.username, Calendar.getInstance().timeInMillis, "C", "期末考什么时候", "大三第一学期"))
+//        manager.insert(Course(4, "计算机图形学", Net.username, Calendar.getInstance().timeInMillis, "D", "还行", "大三第一学期"))
 
         manager.deleteAll(Msg::class.java)
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "C", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "B", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, currentUser.username, "A", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 2, currentUser.username, "B", "你好", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 3, currentUser.username, "C", "期末考什么时候", Msg.LEFT));
-        manager.insert(Msg(Calendar.getInstance().timeInMillis, 4, currentUser.username, "D", "还行", Msg.LEFT));
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, Net.username, "C", "你好", Msg.LEFT))
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, Net.username, "B", "你好", Msg.LEFT))
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 1, Net.username, "A", "你好", Msg.LEFT))
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 2, Net.username, "B", "新年快乐", Msg.LEFT))
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 3, Net.username, "C", "期末考什么时候", Msg.LEFT))
+        manager.insert(Msg(Calendar.getInstance().timeInMillis, 4, Net.username, "D", "还行", Msg.LEFT))
 
 //        manager.deleteAll(Course::class.java)
-//        manager.insert(Course(1, "人工智能", "大三第一学期", currentUser.username))
-//        manager.insert(Course(2, "数据库系统原理", "大三第一学期", currentUser.username))
-//        manager.insert(Course(3, "高性能计算", "大三第一学期", currentUser.username))
-//        manager.insert(Course(4, "计算机图形学", "大三第一学期", currentUser.username))
+//        manager.insert(Course(1, "人工智能", "大三第一学期", Net.username))
+//        manager.insert(Course(2, "数据库系统原理", "大三第一学期", Net.username))
+//        manager.insert(Course(3, "高性能计算", "大三第一学期", Net.username))
+//        manager.insert(Course(4, "计算机图形学", "大三第一学期", Net.username))
     }
 
     private fun initializeDatabase() {
@@ -259,19 +259,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
 //                "组合数学作业",
 //                "第十三次",
-//                currentUser.username).save()
+//                Net.username).save()
 //        Deadline(getNewCalendar(2017, 11, 10).timeInMillis,
 //                "图形学大作业",
 //                "Unity Project. Working with A, B, C, D, E and F. Be responsible for OBing.",
-//                currentUser.username).save()
+//                Net.username).save()
 //        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
 //                "数据库大作业",
 //                "",
-//                currentUser.username).save()
+//                Net.username).save()
 //        Deadline(getNewCalendar(2018, 1, 1).timeInMillis,
 //                "人工智能大作业",
 //                "Building neural network by C++ (Without using any existing package).",
-//                currentUser.username).save()
+//                Net.username).save()
 
 //        DataSupport.deleteAll(Notice::class.java)
 //        Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser).save()
@@ -348,7 +348,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     for (fragment in fragmentManager.fragments) {
                         if (fragment != null && fragment.isVisible && fragment is DeadlineFragment) {
                             val calendar1 = Calendar.getInstance()
-                            val deadline = Deadline(-1, calendar.timeInMillis, title.text.toString(), info.text.toString(), currentUser.username, false)
+                            val deadline = Deadline(-1, calendar.timeInMillis, title.text.toString(), info.text.toString(), Net.username, false)
                             if (title.text.isEmpty()) {
                                 Toast.makeText(this, "Title cannot be empty!", Toast.LENGTH_SHORT).show()
                             }
@@ -414,20 +414,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_finished -> {
                 drawer_layout.closeDrawer(GravityCompat.START)
                 intent = Intent(this, FinishedDeadlineActivity::class.java)
-                intent.putExtra("CurrentUserName", currentUser.username);
+                intent.putExtra("CurrentUserName", Net.username);
                 startActivity(intent)
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
                 drawer_layout.closeDrawers()
                 intent = Intent(this, CourseActivity::class.java)
-                intent.putExtra("CurrentUserName", currentUser.username)
+                intent.putExtra("CurrentUserName", Net.username)
                 startActivity(intent)
             }
             R.id.nav_logout -> {
                 drawer_layout.closeDrawer(GravityCompat.START)
                 Net.logOut()
                 setDrawerHead()
+                clearToken()
             }
         }
 

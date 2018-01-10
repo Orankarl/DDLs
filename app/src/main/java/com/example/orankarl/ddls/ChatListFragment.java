@@ -87,7 +87,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private List<Course> getChatList() {
         if (manager != null) {
-            List<Course> chatList = manager.queryCourse(chatCurrentUserListener.getCurrentUserChat().getUsername());
+            List<Course> chatList = manager.queryCourse(Net.username);
             return chatList;
         }
         return null;
@@ -145,14 +145,14 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
             String message = item.getLatestMsg();
             holder.textView2.setText(name + ": " + message);
 
-            holder.course_id = item.getCourse_id();
+            holder.course_id = item.getId();
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Activity activity = (Activity)view.getContext();
                     Intent intent = new Intent(activity, ChatActivity.class);
-                    intent.putExtra("course_id", item.getCourse_id());
+                    intent.putExtra("course_id", item.getId());
                     intent.putExtra("current_username", item.getUsername());
                     activity.startActivity(intent);
                 }

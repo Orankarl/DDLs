@@ -312,6 +312,9 @@ public class DeadlineFragment extends Fragment implements SwipeRefreshLayout.OnR
 
 //            deadlineList = manager.queryByWhere(Deadline.class, "username", args);
             Collections.sort(deadlineList, DeadlineComparator.INSTANCE);
+            for (int i = 0; i < deadlineList.size(); i++) {
+                Log.d("username", deadlineList.get(i).getUserName());
+            }
         }
     }
 

@@ -28,7 +28,7 @@ public class Net {
     public static boolean isLogin = false;
     public static String token = "";
     public static OkHttpClient client;
-    public static String username, nickname, stuID;
+    public static String username = "local", nickname, stuID;
 
     public static String login(String username, String password) {
         try {
@@ -71,6 +71,7 @@ public class Net {
     public static void logOut() {
         Net.token = "";
         Net.isLogin = false;
+        Net.username = "local";
     }
 
     public static String register(String username, String stuNumber, String nickName, String password) {
@@ -307,6 +308,42 @@ public class Net {
                 return "";
             } else {
                 return reason;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "No Response";
+    }
+
+    public static String queryCourse() {
+        try {
+            if (client == null) client = new OkHttpClient();
+
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
+            params.put("token", token);
+            Request request = new Request.Builder()
+                    .url(attachHttpGetParams(url+"/api/course", params))
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            String string = response.body().string();
+            Log.d("json", string);
+
+            JSONObject jsonObject = new JSONObject(string);
+            String status = jsonObject.getString("status");
+            String reason = jsonObject.getString("reason");
+            if (status.equals("-1")) return reason;
+            else {
+                JSONArray array = jsonObject.getJSONArray("courses");
+                int len = array.length();
+                List<Course> courseList = new ArrayList<>();
+                for (int i = 0; i < len; i++) {
+                    JSONObject json = array.getJSONObject(i);
+                    courseList.add(new Course(json.getInt("id"), json.getString("name"), json.getString("semester"), Net.username));
+                }
+                DatabaseManager.deleteNotices();
+                int code = DatabaseManager.insertCourses(courseList);
+                if (code == 0) return "";
             }
         } catch (Exception e) {
             e.printStackTrace();

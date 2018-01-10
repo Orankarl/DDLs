@@ -278,7 +278,7 @@ public class FinishedDeadlineActivity extends AppCompatActivity implements Finis
 
     public void loadDeadlineList() {
         if (manager != null)
-        deadlineList = manager.queryDeadline(currentUsername, true);
+        deadlineList = manager.queryDeadline(Net.username, true);
         Collections.sort(deadlineList, FinishedDeadlineComparator.INSTANCE);
     }
 

@@ -55,6 +55,20 @@ public class DatabaseManager {
         }
     }
 
+    public static void deleteDeadlines() {
+        if (manager != null) {
+            manager.deleteAll(Deadline.class);
+        }
+    }
+
+    public static int insertCourses(List<Course> list) {
+        if (manager != null) {
+            manager.insertAll(list);
+            return 0;
+        }
+        return 1;
+    }
+
     public <T> long insert(T t) {
         return liteOrm.save(t);
     }
@@ -95,6 +109,7 @@ public class DatabaseManager {
     public List<Deadline> queryDeadline(String username, Boolean isFinished) {
         return liteOrm.query(new QueryBuilder<Deadline>(Deadline.class)
         .where("username = ?", (Object[])new String[]{username})
+//        .where("username = ?", username)
         .whereAppendAnd()
         .where("finished = ?", (Object[])new String[]{String.valueOf(isFinished)}));
     }
