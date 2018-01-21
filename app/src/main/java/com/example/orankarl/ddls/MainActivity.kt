@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //            currentUser = userList[0]
 //        }
 //
-//        DataSupport.deleteAll(Deadline::class.java)
+        DataSupport.deleteAll(Deadline::class.java)
 //        DataSupport.deleteAll(FinishedDeadline::class.java)
 //        Deadline(getNewCalendar(2018, 2, 11).timeInMillis,
 //                "组合数学作业",
@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                "Building neural network by C++ (Without using any existing package).",
 //                Net.username).save()
 
-//        DataSupport.deleteAll(Notice::class.java)
+        DataSupport.deleteAll(Notice::class.java)
 //        Notice(getNewCalendar(2017, 10, 11).timeInMillis, "期中考通知", "组合数学", "时间：xxx\n地点：公教楼xxx课室", currentUser).save()
 //        Notice(getNewCalendar(2017, 12, 26).timeInMillis, "期末展示通知", "数据库系统原理", "1月3号下午在教室进行，请所有小组务必准备好展示用材料", currentUser).save()
 //        Notice(getNewCalendar(2017, 11, 14).timeInMillis, "大作业通知", "移动互联网编程实践", "五人一组\n作业要求见课程主页\n截止日期12.24", currentUser).save()
