@@ -2,6 +2,19 @@
 An Android app for managing your personal DDLs.
 It is the final project of my course "Database System Concepts".
 
+Link: https://github.com/Orankarl/DDLs
+
+
+
+## Functions
+
+-   Add, finish and delete Deadline in Timeline
+-   Unfinish finished Deadline
+-   Receive notices from server
+-   Share Timeline within a screenshot
+-   Register and login
+-   Saving data on server(server is not available at present)
+
 
 
 ## UI
